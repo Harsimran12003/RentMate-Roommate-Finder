@@ -1,69 +1,82 @@
 import React from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
-import { FaHome, FaUser, FaComments, FaMoneyBill, FaBuilding, FaSignOutAlt } from "react-icons/fa";
 
-const DashboardLayout = () => {
-  const location = useLocation();
-  const current = location.pathname;
+import {
+  BuildingOffice2Icon,
+  UserGroupIcon,
+  ChatBubbleLeftRightIcon,
+  CurrencyRupeeIcon,
+} from "@heroicons/react/24/outline";
+import Navbar from "../components/Navbar";
 
-  const navItems = [
-    { name: "Dashboard", path: "/dashboard", icon: <FaHome /> },
-    { name: "Profile", path: "/profile", icon: <FaUser /> },
-    { name: "Properties", path: "/properties", icon: <FaBuilding /> },
-    { name: "Matches", path: "/match", icon: <FaComments /> },
-    { name: "Chat", path: "/chat", icon: <FaComments /> },
-    { name: "Expenses", path: "/expenses", icon: <FaMoneyBill /> },
-  ];
+const stats = [
+  {
+    name: "Total Properties",
+    value: 12,
+    icon: BuildingOffice2Icon,
+    color: "bg-[#00ACC1]/10 text-[#00ACC1]",
+  },
+  {
+    name: "Total Matches",
+    value: 8,
+    icon: UserGroupIcon,
+    color:
+      "bg-green-100 text-green-600 dark:bg-green-800/30 dark:text-green-400",
+  },
+  {
+    name: "Messages",
+    value: 27,
+    icon: ChatBubbleLeftRightIcon,
+    color:
+      "bg-yellow-100 text-yellow-600 dark:bg-yellow-800/30 dark:text-yellow-400",
+  },
+  {
+    name: "Total Expenses",
+    value: "₹5,200",
+    icon: CurrencyRupeeIcon,
+    color: "bg-rose-100 text-rose-600 dark:bg-rose-800/30 dark:text-rose-400",
+  },
+];
 
+const Dashboard = () => {
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex bg-gray-100 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-white">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#00796B] text-white p-6 space-y-6 shadow-lg">
-        <h1 className="text-3xl font-bold mb-10">RentMate</h1>
+      <Navbar />
 
-        <nav className="space-y-4">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex items-center gap-3 px-4 py-2 rounded-lg transition hover:bg-[#004D40] ${
-                current === item.path ? "bg-[#004D40]" : ""
-              }`}
+      {/* Dashboard Content */}
+      <div className="flex-1 p-6">
+        <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map(({ name, value, icon: Icon, color }) => (
+            <div
+              key={name}
+              className="bg-white dark:bg-gray-800 shadow rounded-lg p-5 flex items-center gap-4 hover:shadow-md transition"
             >
-              {item.icon}
-              {item.name}
-            </Link>
+              <div
+                className={`p-3 rounded-full ${color} flex items-center justify-center`}
+              >
+                <Icon className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">{name}</p>
+                <p className="text-xl font-bold">{value}</p>
+              </div>
+            </div>
           ))}
-        </nav>
-
-        <div className="mt-auto">
-          <Link
-            to="/logout"
-            className="flex items-center gap-3 px-4 py-2 rounded-lg transition hover:bg-red-600 bg-red-500"
-          >
-            <FaSignOutAlt />
-            Logout
-          </Link>
         </div>
-      </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Topbar */}
-        <header className="bg-white shadow px-6 py-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-800">
-            {navItems.find((item) => item.path === current)?.name || "Dashboard"}
-          </h2>
-          <div className="text-gray-600">Welcome, User 👋</div>
-        </header>
-
-        {/* Page Content */}
-        <main className="p-6 bg-gray-50 flex-1 overflow-y-auto">
-          <Outlet />
-        </main>
+        {/* Recent Activity Placeholder */}
+        <div className="mt-10 bg-white dark:bg-gray-800 rounded-lg p-6 shadow">
+          <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            You recently matched with 2 new roommates and added a new property.
+          </p>
+        </div>
       </div>
     </div>
   );
 };
 
-export default DashboardLayout;
+export default Dashboard;

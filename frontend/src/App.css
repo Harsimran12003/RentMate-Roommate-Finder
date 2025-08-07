@@ -7,3 +7,20 @@
 .animate-fade-in {
   animation: fade-in 1s ease-out;
 }
+/* DARK MODE */
+body.custom-dark {
+  background-color: #0f172a; /* dark slate */
+  color: #fdfdfd; /* light text */
+}
+
+body.custom-dark .bg-white {
+  background-color: #1e293b !important;
+}
+
+body.custom-dark .text-gray-800 {
+  color: #f1f5f9 !important;
+}
+
+body.custom-dark .border-gray-200 {
+  border-color: #334155 !important;
+}
