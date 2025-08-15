@@ -1,12 +1,10 @@
-import React from "react";
-
 import {
   BuildingOffice2Icon,
   UserGroupIcon,
   ChatBubbleLeftRightIcon,
   CurrencyRupeeIcon,
 } from "@heroicons/react/24/outline";
-import Navbar from "../components/Navbar";
+import Sidebar from "../components/Sidebar";
 
 const stats = [
   {
@@ -41,7 +39,7 @@ const Dashboard = () => {
   return (
     <div className="flex bg-gray-100 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-white">
       {/* Sidebar */}
-      <Navbar />
+      <Sidebar />
 
       {/* Dashboard Content */}
       <div className="flex-1 p-6">

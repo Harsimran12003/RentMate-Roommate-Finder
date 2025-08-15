@@ -1,23 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 
 const Landing = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#e0f7fa] to-[#ffffff] text-gray-800">
       {/* Navbar */}
-      <header className="flex justify-between items-center p-3 md:px-12 shadow-md bg-white display: sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="RentMate Logo" className="w-70 h-15" />
-        </div>
-        <nav className="flex items-center gap-4 text-sm md:text-base">
-          <Link to="/" className="hover:text-[#4e54c8] transition">Home</Link>
-          <Link to="/about" className="hover:text-[#4e54c8] transition">About</Link>
-          <Link to="/login" className="bg-[#4e54c8] text-white px-4 py-2 rounded-xl hover:bg-[#5c6ac4] transition">
-            Login
-          </Link>
-        </nav>
-      </header>
+      <Navbar></Navbar>
 
       {/* Hero Section */}
       <main className="flex flex-col-reverse md:flex-row items-center justify-between px-8 md:px-20 py-16 gap-10">
