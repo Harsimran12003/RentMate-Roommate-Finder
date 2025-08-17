@@ -1,41 +1,54 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import loginIllustration from "/public/house.gif";
+import { loginUser } from "../../services/userService";
+import loginIllustration from "/public/house.png";
 import Navbar from "../../components/Navbar";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const data = await loginUser({ email, password });
+      // Save token in localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed");
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 to-white">
-      {/* Navbar */}
       <Navbar />
-
-      {/* Login Content */}
       <div className="flex flex-1 items-center justify-center px-4">
         <div className="flex w-[70%] h-[440px] max-w-5xl rounded-3xl overflow-hidden shadow-2xl bg-white/40 backdrop-blur-lg">
-          {/* Left Image Side */}
           <div className="w-1/2 hidden md:flex items-center justify-center bg-white p-6">
-            <img
-              src={loginIllustration}
-              alt="Login"
-              className="max-w-full h-auto"
-            />
+            <img src={loginIllustration} alt="Login" className="max-w-full h-auto" />
           </div>
 
-          {/* Right Form Side */}
           <div className="w-full md:w-1/2 p-10">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">
-              Welcome Back 👋
-            </h2>
-            <form className="space-y-6">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">Welcome Back</h2>
+            {error && <p className="text-red-500 mb-4">{error}</p>}
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block mb-2 text-gray-700">Email</label>
                 <input
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  required
                 />
               </div>
               <div>
@@ -43,8 +56,11 @@ const Login = () => {
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    required
                   />
                   <button
                     type="button"
@@ -102,8 +118,7 @@ const Login = () => {
                 </div>
               </div>
               <button
-                type="button"
-                onClick={() => navigate(`/dashboard`)}
+                type="submit"
                 className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-lg font-semibold transition-all"
               >
                 Login

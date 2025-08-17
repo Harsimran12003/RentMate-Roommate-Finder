@@ -1,137 +1,99 @@
-import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import {
-  HomeIcon,
-  UserCircleIcon,
-  ChatBubbleLeftRightIcon,
-  MoonIcon,
-  SunIcon,
-  BuildingOffice2Icon,
-  UserGroupIcon,
-  CurrencyRupeeIcon,
-  Bars3BottomLeftIcon,
-  ArrowRightOnRectangleIcon,
-} from "@heroicons/react/24/outline";
-import Logo from "/public/favicon.png";
+  FaHome,
+  FaUser,
+  FaBuilding,
+  FaHeart,
+  FaComments,
+  FaMoneyBill,
+  FaSignOutAlt,
+  FaBars,
+} from "react-icons/fa";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(true);
-  const [darkMode, setDarkMode] = useState(
-    localStorage.getItem("theme") === "dark"
-  );
+  const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    // Toggle custom dark class
-    if (darkMode) {
-      document.body.classList.add("custom-dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.body.classList.remove("custom-dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [darkMode]);
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const handleLogout = () => {
-    // Clear auth, then redirect (modify as needed)
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
-
-  const navLinks = [
-    { name: "Home", path: "/", icon: HomeIcon },
-    { name: "Profile", path: "/profile", icon: UserCircleIcon },
-    { name: "Properties", path: "/properties", icon: BuildingOffice2Icon },
-    { name: "Matches", path: "/matches", icon: UserGroupIcon },
-    { name: "Chat", path: "/chat", icon: ChatBubbleLeftRightIcon },
-    { name: "Expenses", path: "/expenses", icon: CurrencyRupeeIcon },
+  const menuItems = [
+    { id: "home", path: "/dashboard", label: "Home", icon: <FaHome /> },
+    { id: "profile", path: "/profile", label: "Profile", icon: <FaUser /> },
+    { id: "properties", path: "/properties", label: "Properties", icon: <FaBuilding /> },
+    { id: "matches", path: "/match", label: "Matches", icon: <FaHeart /> },
+    { id: "chat", path: "/chat", label: "Chat", icon: <FaComments /> },
+    { id: "expenses", path: "/expenses", label: "Expenses", icon: <FaMoneyBill /> },
   ];
 
   return (
-    <>
-      {/* Sidebar */}
-      <div
-        className={`fixed top-0 left-0 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 z-50 transform transition-transform duration-300 ease-in-out ${
-          isOpen ? "w-64" : "w-20"
-        }`}
-      >
-        {/* Logo and Toggle */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-          <Link to="/" className="flex items-center gap-2">
-            <img src={Logo} alt="RentMate Logo" className="h-8 w-8" />
-            {isOpen && (
-              <span className="text-xl font-bold text-gray-800 dark:text-white">
-                RentMate
-              </span>
-            )}
-          </Link>
-          <button
-            onClick={toggleSidebar}
-            className="text-gray-600 dark:text-gray-300 focus:outline-none"
-          >
-            <Bars3BottomLeftIcon className="w-6 h-6" />
-          </button>
-        </div>
+    <div
+      className={`h-screen ${
+        collapsed ? "w-20" : "w-64"
+      } bg-gradient-to-b from-blue-400 via-blue-500 to-blue-600 text-white flex flex-col py-6 px-3 shadow-xl transition-all duration-300 rounded-r-3xl`}
+    >
+      {/* Top Section with RentMate Logo */}
+      <div className="flex items-center justify-between px-2 mb-10">
+        {!collapsed && (
+          <div className="flex items-center space-x-2">
+            <img src="/favicon.png" alt="RentMate Logo" className="w-10 h-10 rounded-[3px]" />
+            <h2 className="text-xl font-bold tracking-wide">RentMate</h2>
+          </div>
+        )}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="text-white hover:bg-blue-500 p-2 rounded-lg"
+        >
+          <FaBars />
+        </button>
+      </div>
 
-        {/* Navigation */}
-        <div className="flex flex-col mt-4 space-y-2">
-          {navLinks.map(({ name, path, icon: Icon }) => (
+      {/* Menu Items */}
+      <ul className="flex-1 space-y-3">
+        {menuItems.map((item) => (
+          <li key={item.id}>
             <Link
-              to={path}
-              key={name}
-              className={`flex items-center px-4 py-2 rounded-md mx-2 gap-3 font-medium transition duration-200 ${
-                location.pathname === path
-                  ? "bg-[#00ACC1] text-white"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-[#00ACC1]/10"
+              to={item.path}
+              className={`flex items-center w-full ${
+                collapsed ? "justify-center" : "px-4 justify-start"
+              } py-3 rounded-xl transition-all duration-300 relative group ${
+                location.pathname === item.path
+                  ? "bg-white text-blue-600 shadow-md"
+                  : "text-white-100 hover:bg-blue-500 hover:text-white"
               }`}
             >
-              <Icon className="w-5 h-5" />
-              {isOpen && <span>{name}</span>}
+              <span className="text-lg">{item.icon}</span>
+              {!collapsed && (
+                <span className="ml-3 font-medium">{item.label}</span>
+              )}
+
+              {/* Tooltip when collapsed */}
+              {collapsed && (
+                <span className="absolute left-full ml-3 px-3 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
+                  {item.label}
+                </span>
+              )}
             </Link>
-          ))}
-        </div>
+          </li>
+        ))}
+      </ul>
 
-        {/* Bottom Section */}
-        <div className="absolute bottom-5 w-full px-4 flex flex-col gap-2">
-          {/* Dark Mode Toggle */}
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="w-full flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium text-gray-800 dark:text-gray-100 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
-          >
-            {darkMode ? (
-              <>
-                <SunIcon className="w-5 h-5" />
-                {isOpen && <span>Light Mode</span>}
-              </>
-            ) : (
-              <>
-                <MoonIcon className="w-5 h-5" />
-                {isOpen && <span>Dark Mode</span>}
-              </>
-            )}
-          </button>
-
-          {/* Logout Button */}
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium text-red-600 bg-red-100 dark:bg-red-800 dark:text-white hover:bg-red-200 dark:hover:bg-red-700 transition"
-          >
-            <ArrowRightOnRectangleIcon className="w-5 h-5" />
-            {isOpen && <span>Logout</span>}
-          </button>
-        </div>
+      {/* Logout Button */}
+      <div className="mt-auto">
+        <button
+          onClick={() => alert("Logging out...")}
+          className={`flex items-center w-full ${
+            collapsed ? "justify-center" : "px-4 justify-start"
+          } py-3 rounded-xl transition-all duration-300 relative group text-red-400 hover:bg-red-600 hover:text-white`}
+        >
+          <FaSignOutAlt />
+          {!collapsed && <span className="ml-3 font-medium">Logout</span>}
+          {collapsed && (
+            <span className="absolute left-full ml-3 px-3 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
+              Logout
+            </span>
+          )}
+        </button>
       </div>
-
-      {/* Content Padding */}
-      <div className={`transition-all duration-300 ${isOpen ? "ml-64" : "ml-20"} p-4`}>
-        {/* Page content here */}
-      </div>
-    </>
+    </div>
   );
 };
 
