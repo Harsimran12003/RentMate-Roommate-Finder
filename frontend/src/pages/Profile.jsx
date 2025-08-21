@@ -1,30 +1,81 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import { getUserProfile, updateUserProfile } from "../services/profileService";
+
+const API_BASE = "http://localhost:5000";
+
+/** Convert whatever the backend returns into the shape the UI expects */
+const normalizeUser = (raw = {}, fallbackPic = "") => {
+  const toArrayFromMaybeCSV = (val) =>
+    Array.isArray(val)
+      ? val
+      : val
+      ? String(val).split(",").map((h) => h.trim()).filter(Boolean)
+      : [];
+
+  const absolutePhoto =
+    raw.profilePhoto
+      ? raw.profilePhoto.startsWith("http")
+        ? raw.profilePhoto
+        : `${API_BASE}${raw.profilePhoto}`
+      : fallbackPic || "";
+
+  return {
+    name: raw.fullName || raw.name || "",
+    email: raw.email || "",
+    phone: raw.phone || "",
+    city: raw.city || "",
+    occupation: raw.occupation || "",
+    age: raw.age ?? "",
+    gender: raw.gender || "",
+    budget: raw.budget ?? 0,
+    hobbies: toArrayFromMaybeCSV(raw.hobbies),
+    habits: Array.isArray(raw.habits) ? raw.habits : (raw.habits ? [...raw.habits] : []),
+    profilePic: absolutePhoto,
+  };
+};
 
 const Profile = () => {
-  const initialUser = {
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+91 9876543210",
-    city: "Ludhiana",
-    occupation: "Student",
-    age: 22,
-    gender: "Male",
-    budget: "₹10,000 / month",
-    hobbies: ["Reading", "Gaming"],
-    habits: ["Early riser", "Non-smoker"],
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    city: "",
+    occupation: "",
+    age: "",
+    gender: "",
+    budget: 0,
+    hobbies: [],
+    habits: [],
     profilePic: "",
-  };
-
-  const [user, setUser] = useState(initialUser);
+  });
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
+  const [profileFile, setProfileFile] = useState(null); // selected file (if any)
 
-  // For profile picture preview
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getUserProfile(token);
+        setUser((prev) => normalizeUser(data, prev.profilePic));
+      } catch (err) {
+        setMessage(err.message || "Failed to load profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, [token]);
+
   const handleProfilePicChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setUser((prev) => ({ ...prev, profilePic: imageUrl }));
+      setProfileFile(file);
+      const preview = URL.createObjectURL(file);
+      setUser((prev) => ({ ...prev, profilePic: preview }));
     }
   };
 
@@ -34,37 +85,76 @@ const Profile = () => {
 
   const handleCheckboxChange = (field, value) => {
     setUser((prev) => {
-      const updated = prev[field].includes(value)
-        ? prev[field].filter((item) => item !== value)
+      const exists = prev[field].includes(value);
+      const updated = exists
+        ? prev[field].filter((v) => v !== value)
         : [...prev[field], value];
       return { ...prev, [field]: updated };
     });
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // here you can add API call to save updated user info
+  const handleSave = async () => {
+    try {
+      // Build the payload expected by backend
+      const payload = {
+        fullName: user.name,
+        email: user.email,
+        phone: user.phone,
+        city: user.city,
+        occupation: user.occupation,
+        age: user.age,
+        gender: user.gender,
+        budget: user.budget,
+        // Backend schema stores hobbies as String → send CSV
+        hobbies: (user.hobbies || []).join(", "),
+        habits: user.habits || [],
+        // IMPORTANT: do NOT include profilePhoto unless uploading a new file
+      };
+
+      // If a new image was chosen, send multipart with the file.
+      // If not, send JSON and keep the existing photo on the server.
+      const res = await updateUserProfile(token, payload, profileFile || null);
+
+      // Use the server's updated user and normalize it
+      const savedUser = res.user || res;
+      setUser((prev) => normalizeUser(savedUser, prev.profilePic));
+      setProfileFile(null);
+      setIsEditing(false);
+      setMessage("");
+      alert("Profile updated successfully!");
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      setMessage(err.message || "Failed to update profile");
+    }
   };
 
-  const hobbiesOptions = ["Reading", "Gaming", "Traveling", "Cooking", "Music"];
-  const habitsOptions = ["Early riser", "Night owl", "Smoking", "Drinking", "Vegetarian", "Non-Vegetarian", "Fitness-enthusiast"];
+  const habitsOptions = [
+    "Early riser",
+    "Night owl",
+    "Smoking",
+    "Drinking",
+    "Vegetarian",
+    "Non-Vegetarian",
+    "Fitness-enthusiast",
+  ];
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Loading profile...</div>;
+  }
 
   return (
     <div className="flex bg-gradient-to-br from-blue-100 via-white to-blue-50 min-h-screen">
-      {/* Sidebar */}
       <Sidebar />
-
-      {/* Main Content */}
       <div className="flex-1 p-6 flex items-center justify-center">
         <div className="w-full max-w-6xl bg-white shadow-2xl rounded-3xl p-8 grid grid-cols-1 lg:grid-cols-3 gap-10">
-          
           {/* Left Profile Card */}
           <div className="col-span-1 flex flex-col items-center text-center">
             <div className="relative">
               <img
-                src={user.profilePic || "https://via.placeholder.com/150"}
-                alt={user.name}
+                src={user?.profilePic || "/default-avatar.png"}
+                alt={user.name || "Profile photo"}
                 className="w-40 h-40 rounded-full border-4 border-blue-400 shadow-md object-cover"
+                onError={(e) => { e.currentTarget.src = "/default-avatar.png"; }}
               />
               {isEditing && (
                 <input
@@ -77,8 +167,6 @@ const Profile = () => {
             </div>
             <h2 className="mt-4 text-2xl font-bold text-gray-800">{user.name}</h2>
             <p className="text-gray-500">{user.occupation}</p>
-
-            {/* Quick Info */}
             <div className="mt-6 space-y-3 text-gray-600 text-sm">
               <p>📍 {user.city}</p>
               <p>📧 {user.email}</p>
@@ -88,7 +176,8 @@ const Profile = () => {
 
           {/* Right Profile Details */}
           <div className="col-span-2 flex flex-col justify-between">
-            
+            {message && <p className="text-center text-sm text-red-500">{message}</p>}
+
             <div>
               <h3 className="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">
                 Profile Information
@@ -127,11 +216,14 @@ const Profile = () => {
                     <input
                       type="text"
                       name="hobbies"
-                      value={user.hobbies.join(", ")}
-                      onChange={e =>
-                        setUser(prev => ({
+                      value={(user.hobbies || []).join(", ")}
+                      onChange={(e) =>
+                        setUser((prev) => ({
                           ...prev,
-                          hobbies: e.target.value.split(",").map(h => h.trim()).filter(h => h)
+                          hobbies: e.target.value
+                            .split(",")
+                            .map((h) => h.trim())
+                            .filter(Boolean),
                         }))
                       }
                       className="w-full border rounded-lg px-2 py-1 mt-1"
@@ -139,7 +231,7 @@ const Profile = () => {
                     />
                   ) : (
                     <ul className="list-disc list-inside text-gray-700 space-y-1">
-                      {user.hobbies.map((item, index) => (
+                      {(user.hobbies || []).map((item, index) => (
                         <li key={index}>{item}</li>
                       ))}
                     </ul>
@@ -153,7 +245,7 @@ const Profile = () => {
                         <label key={habit} className="flex items-center space-x-2">
                           <input
                             type="checkbox"
-                            checked={user.habits.includes(habit)}
+                            checked={(user.habits || []).includes(habit)}
                             onChange={() => handleCheckboxChange("habits", habit)}
                           />
                           <span>{habit}</span>
@@ -162,7 +254,7 @@ const Profile = () => {
                     </div>
                   ) : (
                     <ul className="list-disc list-inside text-gray-700 space-y-1">
-                      {user.habits.map((item, index) => (
+                      {(user.habits || []).map((item, index) => (
                         <li key={index}>{item}</li>
                       ))}
                     </ul>
@@ -204,22 +296,20 @@ const Profile = () => {
   );
 };
 
-// Non-editable profile field
 const ProfileField = ({ label, value }) => (
   <div>
     <p className="text-sm text-gray-500">{label}</p>
-    <p className="font-medium text-gray-800">{value}</p>
+    <p className="font-medium text-gray-800">{String(value ?? "")}</p>
   </div>
 );
 
-// Editable input field
 const EditableField = ({ label, name, value, onChange }) => (
   <div>
     <p className="text-sm text-gray-500">{label}</p>
     <input
       type="text"
       name={name}
-      value={value}
+      value={String(value ?? "")}
       onChange={onChange}
       className="w-full border rounded-lg px-2 py-1 mt-1"
     />

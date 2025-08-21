@@ -14,6 +14,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const menuItems = [
     { id: "home", path: "/dashboard", label: "Home", icon: <FaHome /> },
@@ -79,7 +80,7 @@ const Sidebar = () => {
       {/* Logout Button */}
       <div className="mt-auto">
         <button
-          onClick={() => alert("Logging out...")}
+          onClick={() => navigate("/")}
           className={`flex items-center w-full ${
             collapsed ? "justify-center" : "px-4 justify-start"
           } py-3 rounded-xl transition-all duration-300 relative group text-red-400 hover:bg-red-600 hover:text-white`}

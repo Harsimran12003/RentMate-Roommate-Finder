@@ -105,6 +105,7 @@ const Register = () => {
         submitData.append("profilePhoto", profilePhoto);
       }
 
+      navigate("/login");
       await registerUser(submitData);
     } catch (err) {
       setError(err.message || "Registration failed");

@@ -20,3 +20,32 @@ export const loginUser = async (credentials) => {
   const res = await axios.post(`${API_URL}/login`, credentials);
   return res.data;
 };
+
+
+export const getUserProfile = async () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("No token found");
+  }
+
+  const res = await fetch("http://localhost:5000/api/users/profile", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch profile");
+  }
+
+  return res.json();
+};
+
+// Update user profile
+export const updateProfile = async (token, updatedData) => {
+  const res = await axios.put(`${API}/profile`, updatedData, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
