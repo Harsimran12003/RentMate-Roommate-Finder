@@ -4,7 +4,7 @@ import { getUserProfile, updateUserProfile } from "../services/profileService";
 
 const API_BASE = "http://localhost:5000";
 
-/** Convert whatever the backend returns into the shape the UI expects */
+
 const normalizeUser = (raw = {}, fallbackPic = "") => {
   const toArrayFromMaybeCSV = (val) =>
     Array.isArray(val)
@@ -52,7 +52,7 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-  const [profileFile, setProfileFile] = useState(null); // selected file (if any)
+  const [profileFile, setProfileFile] = useState(null); 
 
   const token = localStorage.getItem("token");
 
@@ -95,7 +95,7 @@ const Profile = () => {
 
   const handleSave = async () => {
     try {
-      // Build the payload expected by backend
+      
       const payload = {
         fullName: user.name,
         email: user.email,
@@ -105,17 +105,14 @@ const Profile = () => {
         age: user.age,
         gender: user.gender,
         budget: user.budget,
-        // Backend schema stores hobbies as String → send CSV
         hobbies: (user.hobbies || []).join(", "),
         habits: user.habits || [],
-        // IMPORTANT: do NOT include profilePhoto unless uploading a new file
+
       };
 
-      // If a new image was chosen, send multipart with the file.
-      // If not, send JSON and keep the existing photo on the server.
+
       const res = await updateUserProfile(token, payload, profileFile || null);
 
-      // Use the server's updated user and normalize it
       const savedUser = res.user || res;
       setUser((prev) => normalizeUser(savedUser, prev.profilePic));
       setProfileFile(null);
@@ -269,13 +266,13 @@ const Profile = () => {
                 <>
                   <button
                     onClick={handleSave}
-                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg shadow-md transition"
+                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg shadow-md transition cursor-pointer"
                   >
                     Save
                   </button>
                   <button
                     onClick={() => setIsEditing(false)}
-                    className="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-lg shadow-md transition"
+                    className="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-lg shadow-md transition cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -283,7 +280,7 @@ const Profile = () => {
               ) : (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md transition"
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md transition cursor-pointer"
                 >
                   Edit Profile
                 </button>

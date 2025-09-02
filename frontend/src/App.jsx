@@ -6,7 +6,6 @@ import Landing from './pages/Landing';
 import About from './pages/About';
 import Profile from './pages/Profile';
 import Properties from './pages/Properties';
-import PropertyDetail from './pages/PropertyDetail';
 import Match from './pages/Match';
 import Chat from './pages/Chat';
 import Expenses from './pages/Expenses';
@@ -24,7 +23,6 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/properties" element={<Properties />} />
-        <Route path="/property/:id" element={<PropertyDetail />} />
         <Route path="/match" element={<Match />} />
         <Route path="/chat" element={<Chat />} />
         <Route path="/expenses" element={<Expenses />} />

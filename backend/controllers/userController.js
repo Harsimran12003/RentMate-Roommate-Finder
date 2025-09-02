@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 // Register a new user 
+
 export const registerUser = async (req, res) => {
   try {
     console.log("Register Body:", req.body);
@@ -94,7 +95,7 @@ export const loginUser = async (req, res) => {
   
 };
 
-
+// Get user profile
 export const getUserProfile = async (req, res) => {
   try {
     if (!req.user) {
@@ -135,3 +136,8 @@ export const updateUserProfile = async (req, res) => {
     res.status(500).json({ message: "Error updating profile", error: error.message });
   }
 };
+
+
+
+
+

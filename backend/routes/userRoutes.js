@@ -10,5 +10,4 @@ router.post("/login", loginUser);
 router.get("/profile", protect, getUserProfile);
 router.put("/profile", protect, upload.single("profilePhoto"), updateUserProfile);
 
-
 export default router;

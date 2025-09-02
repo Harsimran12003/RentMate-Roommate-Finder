@@ -29,7 +29,7 @@ const Sidebar = () => {
     <div
       className={`h-screen ${
         collapsed ? "w-20" : "w-64"
-      } bg-gradient-to-b from-blue-400 via-blue-500 to-blue-600 text-white flex flex-col py-6 px-3 shadow-xl transition-all duration-300 rounded-r-3xl`}
+      } bg-gradient-to-b from-blue-400 via-blue-500 to-blue-600 text-white flex flex-col py-6 px-3 shadow-xl transition-all duration-300 rounded-r-3xl sticky top-0`}
     >
       {/* Top Section with RentMate Logo */}
       <div className="flex items-center justify-between px-2 mb-10">
@@ -41,7 +41,7 @@ const Sidebar = () => {
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="text-white hover:bg-blue-500 p-2 rounded-lg"
+          className="text-white hover:bg-blue-500 p-2 rounded-lg cursor-pointer"
         >
           <FaBars />
         </button>
@@ -86,9 +86,9 @@ const Sidebar = () => {
           } py-3 rounded-xl transition-all duration-300 relative group text-red-400 hover:bg-red-600 hover:text-white`}
         >
           <FaSignOutAlt />
-          {!collapsed && <span className="ml-3 font-medium">Logout</span>}
+          {!collapsed && <span className="ml-3 font-medium cursor-pointer">Logout</span>}
           {collapsed && (
-            <span className="absolute left-full ml-3 px-3 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
+            <span className="absolute left-full ml-3 px-3 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap ">
               Logout
             </span>
           )}

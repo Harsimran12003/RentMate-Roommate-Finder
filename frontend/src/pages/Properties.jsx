@@ -1,153 +1,216 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import PropertyCard from "../components/PropertyCard";
+import PropertyForm from "../components/PropertyForm";
+import PropertyFilters from "../components/PropertyFilters";
+import PropertyDetails from "../components/PropertyDetails";
+import {
+  fetchProperties,
+  fetchMyProperties,
+  addProperty,
+  deleteProperty,
+  updateProperty,
+} from "../services/propertyService";
 
 const Properties = () => {
-  const [selectedProperty, setSelectedProperty] = useState(null);
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [viewMy, setViewMy] = useState(false);
 
-  const properties = [
-    {
-      id: 1,
-      image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
-      title: "Spacious 2BHK Apartment",
-      price: "₹12,000/month",
-      location: "Model Town, Ludhiana",
-      tags: ["Wi-Fi", "AC", "Furnished"],
-      description:
-        "A spacious 2BHK with modern amenities, perfect for students and working professionals.",
-    },
-    {
-      id: 2,
-      image: "https://images.unsplash.com/photo-1560448075-bb13b9b3e8a0",
-      title: "1 Room for Girls",
-      price: "₹5,500/month",
-      location: "Civil Lines, Ludhiana",
-      tags: ["Near College", "Safe Area"],
-      description:
-        "Affordable single room accommodation in a safe locality, especially suited for college students.",
-    },
-    {
-      id: 3,
-      image: "https://images.unsplash.com/photo-1586105251261-72a756497a12",
-      title: "Studio Flat for Rent",
-      price: "₹8,000/month",
-      location: "Pakhowal Road, Ludhiana",
-      tags: ["Pet Friendly", "Private Entry"],
-      description:
-        "Compact studio flat with private entry and pet-friendly environment.",
-    },
-  ];
+  const [stateFilter, setStateFilter] = useState("");
+  const [cityFilter, setCityFilter] = useState("");
+
+  const [selectedPropertyId, setSelectedPropertyId] = useState(null);
+  const [showDetails, setShowDetails] = useState(false);
+
+  const [newProperty, setNewProperty] = useState({
+    title: "",
+    description: "",
+    state: "",
+    city: "",
+    rent: "",
+    location: "",
+    tags: [],
+    image: null,
+  });
+
+  const [editingId, setEditingId] = useState(null);
+
+  // Fetch properties
+  const loadProperties = async (state = "", city = "") => {
+    try {
+      setLoading(true);
+      const data = viewMy
+        ? await fetchMyProperties()
+        : await fetchProperties(state, city);
+      setProperties(data);
+      setStateFilter(state);
+      setCityFilter(city);
+    } catch (error) {
+      console.error("Error fetching properties:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProperties(stateFilter, cityFilter);
+  }, [viewMy]);
+
+  // Delete property
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this property?")) return;
+    try {
+      await deleteProperty(id);
+      setProperties(properties.filter((prop) => prop._id !== id));
+    } catch (error) {
+      console.error("Error deleting property:", error);
+    }
+  };
+
+  // Add or Update property
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingId) {
+        const updated = await updateProperty(editingId, newProperty);
+        setProperties(
+          properties.map((p) => (p._id === editingId ? updated : p))
+        );
+        setEditingId(null);
+      } else {
+        const added = await addProperty(newProperty);
+        setProperties([...properties, added]);
+      }
+
+      setNewProperty({
+        title: "",
+        description: "",
+        state: "",
+        city: "",
+        rent: "",
+        location: "",
+        tags: [],
+        image: null,
+      });
+    } catch (error) {
+      console.error("Error saving property:", error);
+    }
+  };
+
+  // Prefill form on edit
+  const handleEdit = (property) => {
+    setNewProperty({
+      title: property.title,
+      description: property.description,
+      state: property.state,
+      city: property.city,
+      rent: property.rent,
+      location: property.location,
+      tags: Array.isArray(property.tags)
+        ? property.tags
+        : typeof property.tags === "string"
+        ? property.tags.split(",").map((t) => t.trim())
+        : [],
+      image: null,
+    });
+    setEditingId(property._id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCancel = () => {
+    setEditingId(null);
+    setNewProperty({
+      title: "",
+      description: "",
+      state: "",
+      city: "",
+      rent: "",
+      location: "",
+      tags: [],
+      image: null,
+    });
+  };
+
+  const onViewDetails = (id) => {
+    setSelectedPropertyId(id);
+    setShowDetails(true);
+  };
+
+  if (loading) return <p>Loading properties...</p>;
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
       <Sidebar />
 
-      {/* Main Content */}
-      <div className="flex-1 p-8 bg-gradient-to-tr from-blue-50 to-purple-100">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-10">
-          Available Properties
-        </h2>
+      <div className="flex-1 p-8 bg-gradient-to-br from-blue-100 via-white to-blue-50 relative">
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-10">
+          Properties
+        </h1>
 
-        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {properties.map((property) => (
-            <div
-              key={property.id}
-              className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition duration-300"
-            >
-              <img
-                src={property.image}
-                alt={property.title}
-                className="w-full h-56 object-cover"
-              />
-              <div className="p-5">
-                <h3 className="text-xl font-semibold text-gray-800">
-                  {property.title}
-                </h3>
-                <p className="text-blue-600 font-medium mt-1">{property.price}</p>
-                <p className="text-gray-600 mt-2 text-sm">{property.location}</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {property.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <button
-                  onClick={() => setSelectedProperty(property)}
-                  className="mt-5 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition"
-                >
-                  View Details
-                </button>
-              </div>
-            </div>
-          ))}
+        {/* Tabs */}
+        <div className="flex justify-center space-x-4 mb-6">
+          <button
+            onClick={() => setViewMy(false)}
+            className={`px-4 py-2 rounded-lg shadow ${
+              !viewMy ? "bg-blue-600 text-white" : "bg-gray-200"
+            }`}
+          >
+            All Properties
+          </button>
+          <button
+            onClick={() => setViewMy(true)}
+            className={`px-4 py-2 rounded-lg shadow ${
+              viewMy ? "bg-blue-600 text-white" : "bg-gray-200"
+            }`}
+          >
+            My Properties
+          </button>
         </div>
-      </div>
 
-      {/* Side Drawer */}
-      <div
-        className={`fixed inset-0 flex justify-end z-50 transition ${
-          selectedProperty ? "visible" : "invisible"
-        }`}
-      >
-        {/* Background Overlay */}
-        <div
-          className={`absolute inset-0 bg-black transition-opacity duration-300 ${
-            selectedProperty ? "bg-opacity-40" : "bg-opacity-0"
-          }`}
-          onClick={() => setSelectedProperty(null)}
-        ></div>
+        {/* Filters */}
+        {!viewMy && (
+          <PropertyFilters
+            onFilter={({ state, city }) => loadProperties(state, city)}
+          />
+        )}
 
-        {/* Drawer */}
-        <div
-          className={`relative w-full sm:w-96 bg-white h-full shadow-xl p-6 overflow-y-auto transform transition-transform duration-500 ease-in-out
-          ${selectedProperty ? "translate-x-0" : "translate-x-full"}`}
-        >
-          {selectedProperty && (
-            <>
-              <button
-                className="absolute top-4 right-4 text-gray-600 hover:text-red-500 text-xl"
-                onClick={() => setSelectedProperty(null)}
-              >
-                ✕
-              </button>
-              <img
-                src={selectedProperty.image}
-                alt={selectedProperty.title}
-                className="w-full h-52 object-cover rounded-lg mb-4"
+        {/* Form */}
+        {viewMy && (
+          <PropertyForm
+            newProperty={newProperty}
+            setNewProperty={setNewProperty}
+            editingId={editingId}
+            handleSubmit={handleSubmit}
+            handleCancel={handleCancel}
+          />
+        )}
+
+        {/* Cards */}
+        {properties.length === 0 ? (
+          <p className="text-center text-gray-600">No properties found.</p>
+        ) : (
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {properties.map((property) => (
+              <PropertyCard
+                key={property._id}
+                property={property}
+                viewMy={viewMy}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onViewDetails={() => onViewDetails(property._id)}
               />
-              <h2 className="text-2xl font-bold text-gray-800">
-                {selectedProperty.title}
-              </h2>
-              <p className="text-blue-600 font-medium mt-1">
-                {selectedProperty.price}
-              </p>
-              <p className="text-gray-600 mt-2">{selectedProperty.location}</p>
+            ))}
+          </div>
+        )}
 
-              <div className="mt-4 flex flex-wrap gap-2">
-                {selectedProperty.tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded-full"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              <p className="mt-6 text-gray-700 leading-relaxed">
-                {selectedProperty.description}
-              </p>
-
-              <button className="mt-6 w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg transition">
-                Contact Owner
-              </button>
-            </>
-          )}
-        </div>
+        {/* Side Drawer */}
+        {showDetails && selectedPropertyId && (
+          <PropertyDetails
+            propertyId={selectedPropertyId}
+            onClose={() => setShowDetails(false)}
+          />
+        )}
       </div>
     </div>
   );
