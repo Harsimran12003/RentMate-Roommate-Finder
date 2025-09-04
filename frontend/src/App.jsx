@@ -7,9 +7,9 @@ import About from './pages/About';
 import Profile from './pages/Profile';
 import Properties from './pages/Properties';
 import Match from './pages/Match';
-import Chat from './pages/Chat';
 import Expenses from './pages/Expenses';
 import DashboardLayout from './pages/DashboardLayout';
+import ChatPage from './pages/ChatPage';
 
 
 function App() {
@@ -24,7 +24,8 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/properties" element={<Properties />} />
         <Route path="/match" element={<Match />} />
-        <Route path="/chat" element={<Chat />} />
+        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/chat/:chatId" element={<ChatPage />} />
         <Route path="/expenses" element={<Expenses />} />
       </Routes>
     </Router>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaHome,
   FaUser,
@@ -12,7 +12,11 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    const saved = localStorage.getItem("sidebarCollapsed");
+    return saved ? JSON.parse(saved) : false;
+  });
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -24,6 +28,10 @@ const Sidebar = () => {
     { id: "chat", path: "/chat", label: "Chat", icon: <FaComments /> },
     { id: "expenses", path: "/expenses", label: "Expenses", icon: <FaMoneyBill /> },
   ];
+
+  useEffect(() => {
+    localStorage.setItem("sidebarCollapsed", JSON.stringify(collapsed));
+  }, [collapsed]);
 
   return (
     <div

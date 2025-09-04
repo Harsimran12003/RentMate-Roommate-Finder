@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const ProfilePane = ({ match, onClose }) => {
+  const currentUser = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
 
   if (!match) return null;
@@ -71,7 +72,18 @@ const ProfilePane = ({ match, onClose }) => {
         </div>
 
         <button
-          onClick={() => navigate(`/chat/${match._id}`)}
+          onClick={async () => {
+            const res = await fetch("http://localhost:5000/api/chats", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                senderId: currentUser.id,
+                receiverId: match._id, 
+              }),
+            });
+            const chat = await res.json();
+            navigate(`/chat/${chat._id}`);
+          }}
           className="mt-8 w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow-md transition cursor-pointer"
         >
           Start Chat

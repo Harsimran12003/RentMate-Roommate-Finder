@@ -1,11 +1,9 @@
-// services/matchService.js
 import User from "../models/User.js";
 
-/** Turn hobbies into an array (your model stores a String) */
 const toArray = (val) => {
   if (!val) return [];
   if (Array.isArray(val)) return val;
-  // comma/pipe/semicolon separated allowed
+  
   return String(val)
     .split(/[,;|]/)
     .map(s => s.trim())

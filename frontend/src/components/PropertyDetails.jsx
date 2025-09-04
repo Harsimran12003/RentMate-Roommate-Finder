@@ -5,11 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { getPropertyById } from "../services/propertyService"; 
 
 const PropertyDetails = ({ propertyId, onClose }) => {
+  const currentUser = JSON.parse(localStorage.getItem("user"));
   const [property, setProperty] = useState(null);
   const [view, setView] = useState("property"); 
   const navigate = useNavigate();
 
-  // Fetch full property details
   useEffect(() => {
     if (propertyId) {
       getPropertyById(propertyId)
@@ -98,13 +98,24 @@ const PropertyDetails = ({ propertyId, onClose }) => {
                   <div className="flex gap-3">
                     <button
                       onClick={() => setView("tenant")}
-                      className="bg-indigo-500 hover:bg-indigo-600 text-white px-2 py-2 rounded-lg shadow-md transition"
+                      className="bg-indigo-500 hover:bg-indigo-600 text-white px-2 py-2 rounded-lg shadow-md transition cursor-pointer"
                     >
                       View Profile
                     </button>
                     <button
-                      onClick={() => navigate(`/chat/${tenant._id}`)}
-                      className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow-md transition"
+                      onClick={async () => {
+                        const res = await fetch("http://localhost:5000/api/chats", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            senderId: currentUser.id,
+                            receiverId: tenant._id, 
+                          }),
+                        });
+                        const chat = await res.json();
+                        navigate(`/chat/${chat._id}`);
+                      }}
+                      className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow-md transition cursor-pointer"
                     >
                       Chat
                     </button>
@@ -133,7 +144,6 @@ const PropertyDetails = ({ propertyId, onClose }) => {
                 </h3>
               </div>
 
-              {/* Tenant fields */}
               <div className="mt-6">
                 <h4 className="font-semibold mb-2">Tenant Details</h4>
                 <div className="space-y-2">
@@ -163,8 +173,19 @@ const PropertyDetails = ({ propertyId, onClose }) => {
               </div>
 
               <button
-                onClick={() => navigate(`/chat/${tenant._id}`)}
-                className="mt-8 w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow-md transition"
+                onClick={async () => {
+                  const res = await fetch("http://localhost:5000/api/chats", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      senderId: currentUser.id,
+                      receiverId: tenant._id, 
+                    }),
+                  });
+                  const chat = await res.json();
+                  navigate(`/chat/${chat._id}`);
+                }}
+                className="mt-8 w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow-md transition cursor-pointer"
               >
                 Start Chat
               </button>

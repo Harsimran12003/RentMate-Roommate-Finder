@@ -52,7 +52,6 @@ export const addProperty = async (req, res) => {
 };
 
 
-
 // getProperties
 export const getProperties = async (req, res) => {
   try {
@@ -62,14 +61,20 @@ export const getProperties = async (req, res) => {
     if (state) filter.state = state;
     if (city) filter.city = city;
 
+    // Exclude logged-in user's properties
+    if (req.user) {
+      filter.tenant = { $ne: new mongoose.Types.ObjectId(req.user._id) };
+    }
+
     const properties = await Property.find(filter)
-      .populate("tenant", "fullName  age gender city occupation hobbies habits  profilePhoto"); 
+      .populate("tenant", "fullName age gender city occupation hobbies habits profilePhoto"); 
     
     res.json(properties);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 export const getMyProperties = async (req, res) => {
