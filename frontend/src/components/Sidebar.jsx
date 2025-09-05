@@ -42,9 +42,10 @@ const Sidebar = () => {
       {/* Top Section with RentMate Logo */}
       <div className="flex items-center justify-between px-2 mb-10">
         {!collapsed && (
-          <div className="flex items-center space-x-2">
-            <img src="/favicon.png" alt="RentMate Logo" className="w-10 h-10 rounded-[3px]" />
-            <h2 className="text-xl font-bold tracking-wide">RentMate</h2>
+          <div className="flex items-center space-x-0">
+            {/* <img src="/favicon.png" alt="RentMate Logo" className="w-9 h-10 rounded-[3px]" /> */}
+            <img src="/logo1.png" alt="RentMate Logo" className="w-35 h-7 rounded-[3px]" />
+            {/* <h2 className="text-xl font-bold tracking-wide">RentMate</h2> */}
           </div>
         )}
         <button

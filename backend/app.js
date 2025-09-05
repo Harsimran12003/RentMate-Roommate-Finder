@@ -3,7 +3,6 @@ import http from "http";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
-import testimonialRoutes from "./routes/testimonialRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import propertyRoutes from "./routes/propertyRoutes.js";
 import matchRoutes from "./routes/matchRoutes.js";
@@ -46,7 +45,6 @@ const __dirname = path.dirname(__filename);
 
 // Routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use("/api/testimonials", testimonialRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/matches", matchRoutes);
