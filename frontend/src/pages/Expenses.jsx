@@ -1,151 +1,147 @@
-import React, { useState } from "react";
-import Sidebar from "../components/Sidebar"; // adjust path based on your folder structure
+import React, { useEffect, useState } from "react";
+import Sidebar from "../components/Sidebar";
+import {
+  fetchGroups,
+  createGroup,
+  fetchGroupMembers,
+  deleteGroup,
+  searchUsers,
+} from "../services/groupService";
+import {
+  fetchExpenses,
+  addExpense,
+  deleteExpense,
+} from "../services/expensesService";
+
+import GroupSection from "../components/GroupSection";
+import AddExpenseForm from "../components/AddExpenseForm";
+import ExpenseHistory from "../components/ExpenseHistory";
+import ExpenseAnalytics from "../components/ExpenseAnalytics";
 
 const Expenses = () => {
-  const [expenses, setExpenses] = useState([
-    {
-      id: 1,
-      title: "Rent",
-      amount: 12000,
-      paidBy: "You",
-      date: "2025-08-01",
-    },
-    {
-      id: 2,
-      title: "Electricity Bill",
-      amount: 1500,
-      paidBy: "Riya",
-      date: "2025-08-03",
-    },
-  ]);
+  const [groups, setGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [members, setMembers] = useState([]);
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const [newExpense, setNewExpense] = useState({
-    title: "",
-    amount: "",
-    paidBy: "",
-    date: "",
-  });
+  const currentUser = JSON.parse(localStorage.getItem("user"));
 
-  const handleAddExpense = () => {
-    if (
-      !newExpense.title.trim() ||
-      !newExpense.amount ||
-      !newExpense.paidBy.trim() ||
-      !newExpense.date
-    )
-      return;
+  //  Utility: group expenses by month
+  const groupByMonth = (expenses) => {
+    const grouped = {};
+    expenses.forEach((exp) => {
+      const date = new Date(exp.date);
+      const monthYear = date.toLocaleString("default", {
+        month: "long",
+        year: "numeric",
+      });
 
-    setExpenses([
-      ...expenses,
-      {
-        ...newExpense,
-        id: Date.now(),
-        amount: parseFloat(newExpense.amount),
-      },
-    ]);
-
-    setNewExpense({ title: "", amount: "", paidBy: "", date: "" });
+      if (!grouped[monthYear]) {
+        grouped[monthYear] = { total: 0, items: [] };
+      }
+      grouped[monthYear].items.push(exp);
+      grouped[monthYear].total += Number(exp.amount) || 0;
+    });
+    return grouped;
   };
 
-  const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  //  Load Groups
+  useEffect(() => {
+    const load = async () => {
+      const data = await fetchGroups();
+      setGroups(data);
+      if (data.length > 0) setSelectedGroup(data[0]._id);
+    };
+    load();
+  }, []);
+
+  //  Load Members
+  useEffect(() => {
+    if (!selectedGroup) return;
+    const loadMembers = async () => {
+      const data = await fetchGroupMembers(selectedGroup);
+      setMembers(data);
+    };
+    loadMembers();
+  }, [selectedGroup]);
+
+  // 🔹 Load Expenses
+  useEffect(() => {
+    if (!selectedGroup) return;
+    const loadExpenses = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchExpenses(selectedGroup);
+        setExpenses(data);
+      } catch (err) {
+        console.error("Error fetching expenses:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadExpenses();
+  }, [selectedGroup]);
+
+  //  Add Expense
+  const handleAddExpense = async (newExpense) => {
+    const created = await addExpense({
+      ...newExpense,
+      amount: parseFloat(newExpense.amount),
+      groupId: selectedGroup,
+    });
+    setExpenses([...expenses, created]);
+  };
+
+  //  Delete Expense
+  const handleDeleteExpense = async (id) => {
+    if (!window.confirm("Delete this expense?")) return;
+    await deleteExpense(id);
+    setExpenses(expenses.filter((e) => e._id !== id));
+  };
+
+  const groupedExpenses = groupByMonth(expenses);
+  const total = expenses.reduce(
+    (sum, exp) => sum + (Number(exp.amount) || 0),
+    0
+  );
 
   return (
     <div className="flex">
-      {/* Sidebar */}
       <Sidebar />
-
-      {/* Main Content */}
-      <div className="flex-1 min-h-screen bg-gradient-to-r from-[#DBEAFE] via-white to-[#EFF6FF] px-8 py-10">
+      <div className="flex-1 min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-50 px-8 py-10">
         <h1 className="text-3xl font-bold text-center mb-10 text-[#1565C0]">
           Shared Expenses
         </h1>
 
-        {/* Add Expense */}
-        <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-6 mb-10">
-          <h2 className="text-xl font-semibold mb-4 text-[#0D47A1]">
-            Add Expense
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <input
-              type="text"
-              placeholder="Title"
-              value={newExpense.title}
-              onChange={(e) =>
-                setNewExpense({ ...newExpense, title: e.target.value })
-              }
-              className="border p-2 rounded-lg"
-            />
-            <input
-              type="number"
-              placeholder="Amount"
-              value={newExpense.amount}
-              onChange={(e) =>
-                setNewExpense({ ...newExpense, amount: e.target.value })
-              }
-              className="border p-2 rounded-lg"
-            />
-            <input
-              type="text"
-              placeholder="Paid by"
-              value={newExpense.paidBy}
-              onChange={(e) =>
-                setNewExpense({ ...newExpense, paidBy: e.target.value })
-              }
-              className="border p-2 rounded-lg"
-            />
-            <input
-              type="date"
-              value={newExpense.date}
-              onChange={(e) =>
-                setNewExpense({ ...newExpense, date: e.target.value })
-              }
-              className="border p-2 rounded-lg"
-            />
-          </div>
-          <button
-            onClick={handleAddExpense}
-            className="mt-4 px-6 py-2 bg-[#1976D2] text-white rounded-lg hover:bg-[#0D47A1] transition"
-          >
-            Add
-          </button>
-        </div>
+        {/* Groups Section */}
+        <GroupSection
+          groups={groups}
+          setGroups={setGroups}
+          selectedGroup={selectedGroup}
+          setSelectedGroup={setSelectedGroup}
+          currentUser={currentUser}
+          createGroup={createGroup}
+          deleteGroup={deleteGroup}
+          searchUsers={searchUsers}
+        />
 
-        {/* Expense List */}
-        <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-6">
-          <h2 className="text-xl font-semibold mb-4 text-[#0D47A1]">
-            Expense History
-          </h2>
-          {expenses.length === 0 ? (
-            <p className="text-gray-500">No expenses yet.</p>
-          ) : (
-            <table className="w-full table-auto border-collapse">
-              <thead>
-                <tr className="bg-[#BBDEFB] text-[#0D47A1]">
-                  <th className="p-2">Title</th>
-                  <th className="p-2">Amount (₹)</th>
-                  <th className="p-2">Paid By</th>
-                  <th className="p-2">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {expenses.map((exp) => (
-                  <tr
-                    key={exp.id}
-                    className="text-center hover:bg-gray-100 transition"
-                  >
-                    <td className="p-2">{exp.title}</td>
-                    <td className="p-2">{exp.amount}</td>
-                    <td className="p-2">{exp.paidBy}</td>
-                    <td className="p-2">{exp.date}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-          <div className="mt-4 text-right text-lg font-medium text-[#0D47A1]">
-            Total: ₹{total}
+        {/* Expense Section */}
+        {selectedGroup && (
+          <div className="max-w-5xl mx-auto">
+            <AddExpenseForm
+              members={members}
+              onAddExpense={handleAddExpense}
+            />
+            <ExpenseHistory
+              groupedExpenses={groupedExpenses}
+              loading={loading}
+              total={total}
+              onDelete={handleDeleteExpense}
+            />
+            <ExpenseAnalytics expenses={expenses} groupedExpenses={groupedExpenses} />
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

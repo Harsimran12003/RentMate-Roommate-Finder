@@ -8,6 +8,8 @@ import propertyRoutes from "./routes/propertyRoutes.js";
 import matchRoutes from "./routes/matchRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import expenseRoutes from "./routes/expenseRoutes.js";
+import groupRoutes from "./routes/groupRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -51,6 +53,9 @@ app.use("/api/matches", matchRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/chats", chatRoutes);
+app.use("/api/expenses", expenseRoutes);
+app.use("/api/groups", groupRoutes);
+
 
 // Root route
 app.get("/", (req, res) => {
