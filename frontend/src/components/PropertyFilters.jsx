@@ -6,7 +6,8 @@ export default function PropertyFilters({ onFilter }) {
 
   const handleFilter = (e) => {
     e.preventDefault();
-    onFilter({ state, city });
+    // normalize to lowercase before sending
+    onFilter({ state: state.toLowerCase(), city: city.toLowerCase() });
   };
 
   const handleClear = () => {

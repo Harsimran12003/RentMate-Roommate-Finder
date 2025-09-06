@@ -55,25 +55,35 @@ export const addProperty = async (req, res) => {
 // getProperties
 export const getProperties = async (req, res) => {
   try {
-    const { state, city } = req.query; 
+    const { state, city } = req.query;
     let filter = {};
 
-    if (state) filter.state = state;
-    if (city) filter.city = city;
+    if (state) {
+      filter.state = { $regex: new RegExp(`${state}`, "i") }; 
+      // exact match ignoring case
+    }
+
+    if (city) {
+      filter.city = { $regex: new RegExp(`${city}`, "i") }; 
+      // exact match ignoring case
+    }
 
     // Exclude logged-in user's properties
     if (req.user) {
       filter.tenant = { $ne: new mongoose.Types.ObjectId(req.user._id) };
     }
 
-    const properties = await Property.find(filter)
-      .populate("tenant", "fullName age gender city occupation hobbies habits profilePhoto"); 
-    
+    const properties = await Property.find(filter).populate(
+      "tenant",
+      "fullName age gender city occupation hobbies habits profilePhoto"
+    );
+
     res.json(properties);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 
