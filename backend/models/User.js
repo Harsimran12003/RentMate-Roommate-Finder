@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 5, 
+      minlength: 5,
     },
     gender: {
       type: String,
@@ -39,17 +39,17 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
     hobbies: {
-      type: String, 
+      type: String, // stored as comma-separated string
       trim: true,
     },
     habits: {
-      type: [String], 
+      type: [String],
       default: [],
     },
-    budget: {
-      type: Number, 
-      min: 0,
-      default: 0,
+    roommateStatus: {
+      type: String,
+      enum: ["Looking for roommate", "All settled"],
+      default: "Looking for roommate",
     },
     profilePhoto: {
       type: String,
@@ -57,10 +57,10 @@ const userSchema = new mongoose.Schema(
     },
     lastLogin: {
       type: Date,
-      default: null, 
+      default: null,
     },
   },
-  { timestamps: true } 
+  { timestamps: true }
 );
 
 const User = mongoose.model("User", userSchema);

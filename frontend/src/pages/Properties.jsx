@@ -15,7 +15,6 @@ import {
 const Properties = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [viewMy, setViewMy] = useState(false);
 
   const [stateFilter, setStateFilter] = useState("");
   const [cityFilter, setCityFilter] = useState("");
@@ -35,14 +34,18 @@ const Properties = () => {
   });
 
   const [editingId, setEditingId] = useState(null);
+  const [activeTab, setActiveTab] = useState("all"); // all | my | add
 
   // Fetch properties
   const loadProperties = async (state = "", city = "") => {
     try {
       setLoading(true);
-      const data = viewMy
-        ? await fetchMyProperties()
-        : await fetchProperties(state, city);
+      let data = [];
+      if (activeTab === "my") {
+        data = await fetchMyProperties();
+      } else {
+        data = await fetchProperties(state, city);
+      }
       setProperties(data);
       setStateFilter(state);
       setCityFilter(city);
@@ -55,7 +58,7 @@ const Properties = () => {
 
   useEffect(() => {
     loadProperties(stateFilter, cityFilter);
-  }, [viewMy]);
+  }, [activeTab]);
 
   // Delete property
   const handleDelete = async (id) => {
@@ -80,7 +83,10 @@ const Properties = () => {
         setEditingId(null);
       } else {
         const added = await addProperty(newProperty);
-        setProperties([...properties, added]);
+        // If currently in 'my' tab, show the new property immediately
+        if (activeTab === "my") {
+          setProperties([...properties, added]);
+        }
       }
 
       setNewProperty({
@@ -93,6 +99,7 @@ const Properties = () => {
         tags: [],
         image: null,
       });
+      setActiveTab("my"); // switch to My Properties after adding
     } catch (error) {
       console.error("Error saving property:", error);
     }
@@ -115,6 +122,7 @@ const Properties = () => {
       image: null,
     });
     setEditingId(property._id);
+    setActiveTab("add"); // edit happens in add tab
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -151,32 +159,40 @@ const Properties = () => {
         {/* Tabs */}
         <div className="flex justify-center space-x-4 mb-6">
           <button
-            onClick={() => setViewMy(false)}
-            className={`px-4 py-2 rounded-lg shadow ${
-              !viewMy ? "bg-blue-600 text-white" : "bg-gray-200"
+            onClick={() => setActiveTab("all")}
+            className={`px-4 py-2 rounded-lg shadow font-medium ${
+              activeTab === "all" ? "bg-blue-600 text-white" : "bg-gray-200"
             }`}
           >
             All Properties
           </button>
           <button
-            onClick={() => setViewMy(true)}
-            className={`px-4 py-2 rounded-lg shadow ${
-              viewMy ? "bg-blue-600 text-white" : "bg-gray-200"
+            onClick={() => setActiveTab("my")}
+            className={`px-4 py-2 rounded-lg shadow font-medium ${
+              activeTab === "my" ? "bg-blue-600 text-white" : "bg-gray-200"
             }`}
           >
             My Properties
           </button>
+          <button
+            onClick={() => setActiveTab("add")}
+            className={`px-4 py-2 rounded-lg shadow font-medium ${
+              activeTab === "add" ? "bg-blue-600 text-white" : "bg-gray-200"
+            }`}
+          >
+            Add Property
+          </button>
         </div>
 
         {/* Filters */}
-        {!viewMy && (
+        {activeTab === "all" && (
           <PropertyFilters
             onFilter={({ state, city }) => loadProperties(state, city)}
           />
         )}
 
-        {/* Form */}
-        {viewMy && (
+        {/* Add / Edit Form */}
+        {activeTab === "add" && (
           <PropertyForm
             newProperty={newProperty}
             setNewProperty={setNewProperty}
@@ -186,23 +202,24 @@ const Properties = () => {
           />
         )}
 
-        {/* Cards */}
-        {properties.length === 0 ? (
-          <p className="text-center text-gray-600">No properties found.</p>
-        ) : (
-          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {properties.map((property) => (
-              <PropertyCard
-                key={property._id}
-                property={property}
-                viewMy={viewMy}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onViewDetails={() => onViewDetails(property._id)}
-              />
-            ))}
-          </div>
-        )}
+        {/* Property Cards */}
+        {(activeTab === "all" || activeTab === "my") &&
+          (properties.length === 0 ? (
+            <p className="text-center text-gray-600">No properties found.</p>
+          ) : (
+            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {properties.map((property) => (
+                <PropertyCard
+                  key={property._id}
+                  property={property}
+                  viewMy={activeTab === "my"}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onViewDetails={() => onViewDetails(property._id)}
+                />
+              ))}
+            </div>
+          ))}
 
         {/* Side Drawer */}
         {showDetails && selectedPropertyId && (

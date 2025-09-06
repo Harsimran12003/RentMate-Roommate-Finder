@@ -11,6 +11,7 @@ const Match = () => {
   const [matches, setMatches] = useState([]);
   const [cityFilter, setCityFilter] = useState("");
   const [genderFilter, setGenderFilter] = useState("");
+  const [nameFilter, setNameFilter] = useState(""); 
   const [selectedMatch, setSelectedMatch] = useState(null);
 
   useEffect(() => {
@@ -41,13 +42,18 @@ const Match = () => {
     [matches]
   );
 
+  // Apply all filters together (city, gender, name)
   const filteredMatches = useMemo(() => {
     return matches.filter((m) => {
       const cityOk = cityFilter ? m.city === cityFilter : true;
       const genderOk = genderFilter ? m.gender === genderFilter : true;
-      return cityOk && genderOk;
+      const nameOk = nameFilter
+        ? m.fullName?.toLowerCase().includes(nameFilter.toLowerCase())
+        : true;
+
+      return cityOk && genderOk && nameOk;
     });
-  }, [matches, cityFilter, genderFilter]);
+  }, [matches, cityFilter, genderFilter, nameFilter]);
 
   return (
     <div className="flex min-h-screen bg-gradient-to-r from-[#DBEAFE] via-white to-[#EFF6FF]">
@@ -64,6 +70,15 @@ const Match = () => {
           <>
             {/* Filters */}
             <div className="max-w-5xl mx-auto mb-8 flex flex-wrap gap-4 justify-center">
+              {/*  Name search input */}
+              <input
+                type="text"
+                placeholder="Search by name..."
+                value={nameFilter}
+                onChange={(e) => setNameFilter(e.target.value)}
+                className="p-2 rounded-md border border-gray-300"
+              />
+
               <select
                 value={cityFilter}
                 onChange={(e) => setCityFilter(e.target.value)}
