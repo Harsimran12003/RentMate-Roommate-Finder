@@ -63,6 +63,7 @@ export const getMatchesForUser = async (userId) => {
       hobbies: hobbiesArray,
       habits: Array.isArray(o.habits) ? o.habits : toArray(o.habits),
       score,
+      policeVerification: o.policeVerification,
     };
   });
 

@@ -9,6 +9,8 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
+  const [policeVerification, setPoliceVerification] = useState(null);
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -18,7 +20,7 @@ const Register = () => {
     phone: "",
     age: "",
     city: "",
-    occupation: "",
+    occupation: "", 
     hobbies: "",
     habits: [],
   });
@@ -76,13 +78,25 @@ const Register = () => {
     setProfilePhoto(null);
   };
 
+  const handlePoliceVerificationUpload = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    setPoliceVerification(file);
+  }
+};
+
+const handlePoliceVerificationDelete = () => {
+  setPoliceVerification(null);
+};
+
+
   // submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
-      return;
+      return;  
     }
 
     setError("");
@@ -104,6 +118,10 @@ const Register = () => {
       if (profilePhoto) {
         submitData.append("profilePhoto", profilePhoto);
       }
+      if (policeVerification) {
+        submitData.append("policeVerification", policeVerification);
+      }
+
       await registerUser(submitData);
       navigate("/login");
       
@@ -135,19 +153,14 @@ const Register = () => {
                 }
                 alt="Profile"
                 className="w-28 h-28 rounded-full object-cover border-4 border-blue-400"
-              />
+              /> 
               <label
                 htmlFor="profile-upload"
-                className="absolute bottom-0 right-0 bg-blue-500 p-2 rounded-full cursor-pointer hover:bg-blue-600 transition"
+                className="absolute bottom-0 right-0 bg-blue-500 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer hover:bg-blue-600 transition"
+                title="Upload photo"
+                aria-label="Upload profile photo"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-white"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path d="M4 3a2 2 0 00-2 2v2a2 2 0 002 2h1v6a2 2 0 002 2h6a2 2 0 002-2v-6h1a2 2 0 002-2V5a2 2 0 00-2-2H4z" />
-                </svg>
+                <span className="text-white text-xl font-bold leading-none">+</span>
               </label>
               <input
                 id="profile-upload"
@@ -489,6 +502,36 @@ const Register = () => {
                 ))}
               </div>
             </div>
+
+            {/* Police Verification Upload */}
+<div className="col-span-2">
+  <label className="block mb-1 text-gray-800 font-semibold">
+    Police Verification Document
+  </label>
+  <div className="flex items-center space-x-3">
+    <input
+      type="file"
+      accept=".pdf, image/*"
+      onChange={handlePoliceVerificationUpload}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
+    />
+    {policeVerification && (
+      <button
+        type="button"
+        onClick={handlePoliceVerificationDelete}
+        className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600"
+      >
+        Remove
+      </button>
+    )}
+  </div>
+  {policeVerification && (
+    <p className="text-sm text-gray-600 mt-1">
+      File selected: {policeVerification.name}
+    </p>
+  )}
+</div>
+
 
             {/* Submit */}
             <div className="col-span-2">

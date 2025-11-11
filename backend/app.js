@@ -47,6 +47,7 @@ const __dirname = path.dirname(__filename);
 
 // Routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 app.use("/api/users", userRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/matches", matchRoutes);

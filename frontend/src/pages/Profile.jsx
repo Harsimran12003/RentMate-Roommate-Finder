@@ -57,7 +57,7 @@ const Profile = () => {
   const [profileFile, setProfileFile] = useState(null);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
-  // ✅ new password state
+  // new password state
   const [passwords, setPasswords] = useState({
     current: "",
     new: "",
@@ -101,7 +101,7 @@ const Profile = () => {
         : [...prev[field], value];
       return { ...prev, [field]: updated };
     });
-  };
+  }; 
 
   const handleSave = async () => {
     try {
@@ -160,7 +160,7 @@ const Profile = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        Loading profile...
+        Loading profile... 
       </div>
     );
   }

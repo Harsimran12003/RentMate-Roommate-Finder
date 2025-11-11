@@ -219,7 +219,7 @@ const Properties = () => {
                 />
               ))}
             </div>
-          ))}
+          ))} 
 
         {/* Side Drawer */}
         {showDetails && selectedPropertyId && (

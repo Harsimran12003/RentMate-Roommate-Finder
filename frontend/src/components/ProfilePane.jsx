@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const ProfilePane = ({ match, onClose }) => {
@@ -8,6 +8,15 @@ const ProfilePane = ({ match, onClose }) => {
   const navigate = useNavigate();
 
   if (!match) return null;
+
+
+  const getFileUrl = (filePath) => {
+    if (!filePath || filePath === "undefined" || filePath === "") return null;
+    if (filePath.startsWith("http")) return filePath;
+    return `http://localhost:5000${filePath.startsWith("/") ? filePath : `/${filePath}`}`;
+  };
+
+  const policeVerification = getFileUrl(match.policeVerification);
 
   return (
     <motion.div
@@ -31,9 +40,7 @@ const ProfilePane = ({ match, onClose }) => {
           <img
             src={
               match.profilePhoto
-                ? match.profilePhoto.startsWith("http")
-                  ? match.profilePhoto
-                  : `http://localhost:5000${match.profilePhoto}`
+                ? getFileUrl(match.profilePhoto)
                 : "https://via.placeholder.com/400"
             }
             alt={match.fullName}
@@ -58,6 +65,7 @@ const ProfilePane = ({ match, onClose }) => {
                   "createdAt",
                   "updatedAt",
                   "score",
+                  "policeVerification",
                 ].includes(key)
               )
                 return null;
@@ -71,6 +79,45 @@ const ProfilePane = ({ match, onClose }) => {
           </div>
         </div>
 
+        {/* Police Verification Document */}
+        <div className=" pt-4">
+          <h4 className="font-semibold mb-2 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-gray-600" />
+            Police Verification Document
+          </h4>
+
+          {policeVerification ? (
+            <div className="flex flex-col items-center gap-2">
+              {policeVerification.toLowerCase().includes(".pdf") ? (
+                <iframe
+                  src={policeVerification}
+                  title="Police Verification Document"
+                  className="w-full h-50 border rounded-md shadow-sm"
+                ></iframe>
+              ) : (
+                <img
+                  src={policeVerification}
+                  alt="Police Verification"
+                  className="w-full h-40 object-cover rounded-md shadow-sm"
+                />
+              )}
+
+              <button
+                onClick={() => window.open(policeVerification, "_blank")}
+                className="bg-blue-400 hover:bg-blue-600 text-white px-2 py-1 rounded-md text-sm shadow-md transition cursor-pointer "
+              >
+                Open Document
+              </button>
+            </div>
+          ) : (
+            <p className="text-gray-500 text-sm italic">
+              No police verification document uploaded.
+            </p>
+          )}
+        </div>
+
+
+        {/* Start Chat Button */}
         <button
           onClick={async () => {
             const res = await fetch("http://localhost:5000/api/chats", {
@@ -78,7 +125,7 @@ const ProfilePane = ({ match, onClose }) => {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 senderId: currentUser.id,
-                receiverId: match._id, 
+                receiverId: match._id,
               }),
             });
             const chat = await res.json();

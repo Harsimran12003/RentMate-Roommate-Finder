@@ -9,31 +9,26 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section className="px-8 md:px-20 py-20 bg-white">
-      <h3 className="text-4xl font-extrabold text-center mb-16 text-[#4e54c8]">
+    <section className="px-6 sm:px-10 md:px-20 py-16 md:py-20 bg-white">
+      <h3 className="text-3xl sm:text-4xl font-extrabold text-center mb-12 text-[#4e54c8]">
         How It Works
       </h3>
 
-      <div className="grid gap-12 md:grid-cols-4 text-center">
+      <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 text-center">
         {steps.map((step, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: index * 0.2 }}
+            transition={{ duration: 0.5, delay: index * 0.2 }}
             viewport={{ once: true }}
-            className="relative group bg-gray-50 rounded-2xl p-8 shadow-md hover:shadow-xl transition transform hover:-translate-y-2 hover:scale-105"
+            className="bg-gray-50 rounded-2xl p-8 shadow-md hover:shadow-xl transition transform hover:-translate-y-2"
           >
-            <div className="w-16 h-16 mx-auto flex items-center justify-center rounded-full bg-gradient-to-br from-[#4e54c8] to-[#5c6ac4] text-white text-3xl shadow-lg">
+            <div className="w-14 h-14 mx-auto flex items-center justify-center rounded-full bg-gradient-to-br from-[#4e54c8] to-[#5c6ac4] text-white text-3xl mb-4">
               {step.icon}
             </div>
-            <h4 className="font-bold text-xl mt-6 group-hover:text-[#4e54c8] transition">
-              {step.title}
-            </h4>
-            <p className="text-gray-600 mt-3">{step.desc}</p>
-            <span className="absolute top-4 right-4 text-gray-300 text-5xl font-extrabold opacity-20">
-              {`0${index + 1}`}
-            </span>
+            <h4 className="font-semibold text-lg text-gray-800 mb-2">{step.title}</h4>
+            <p className="text-gray-600 text-sm">{step.desc}</p>
           </motion.div>
         ))}
       </div>

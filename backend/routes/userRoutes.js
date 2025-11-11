@@ -5,7 +5,14 @@ import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/register", upload.single("profilePhoto"), registerUser);
+router.post(
+  "/register",
+  upload.fields([
+    { name: "profilePhoto", maxCount: 1 },
+    { name: "policeVerification", maxCount: 1 },
+  ]),
+  registerUser
+);
 router.post("/login", loginUser);
 router.get("/profile", protect, getUserProfile);
 router.put("/profile", protect, upload.single("profilePhoto"), updateUserProfile);

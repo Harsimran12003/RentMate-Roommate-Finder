@@ -26,25 +26,23 @@ const features = [
 
 const Features = () => {
   return (
-    <section className="px-8 md:px-20 py-20 bg-gradient-to-br from-purple-50 to-indigo-50">
-      <h2 className="text-4xl font-bold text-center mb-14 text-[#4e54c8]">
+    <section className="px-6 sm:px-10 md:px-20 py-16 bg-gradient-to-br from-purple-50 to-indigo-50">
+      <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-[#4e54c8]">
         Key Features
       </h2>
 
-      <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
+      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
         {features.map((feature, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: index * 0.2 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
             viewport={{ once: true }}
-            className="p-6 bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-2 transform transition-all duration-300 text-center"
+            className="p-6 bg-white rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-2 transition-all text-center"
           >
             <div className="flex justify-center mb-4">{feature.icon}</div>
-            <h4 className="font-semibold text-lg mb-2 text-gray-800">
-              {feature.title}
-            </h4>
+            <h4 className="font-semibold text-lg mb-2">{feature.title}</h4>
             <p className="text-gray-600 text-sm">{feature.desc}</p>
           </motion.div>
         ))}

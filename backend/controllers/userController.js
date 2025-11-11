@@ -6,12 +6,25 @@ import jwt from "jsonwebtoken";
 
 export const registerUser = async (req, res) => {
   try {
-    console.log("Register Body:", req.body);
-
-    const { fullName, email, password, gender, phone, age, city, occupation, hobbies, habits } = req.body;
+    const {
+      fullName,
+      email,
+      password,
+      confirmPassword,
+      gender,
+      phone,
+      age,
+      city,
+      occupation,
+      hobbies,
+      habits
+    } = req.body;
 
     if (!fullName || !email || !password) {
       return res.status(400).json({ message: "Full name, email, and password are required" });
+    }
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
     }
 
     // Check if email already exists
@@ -24,7 +37,14 @@ export const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const newUser = new User({
+    const profilePhoto = req.files?.profilePhoto
+      ? `/uploads/${req.files.profilePhoto[0].filename}`
+      : "";
+    const policeVerification = req.files?.policeVerification
+      ? `/uploads/${req.files.policeVerification[0].filename}`
+      : "";
+
+const newUser = new User({
       fullName,
       email,
       password: hashedPassword,
@@ -35,9 +55,10 @@ export const registerUser = async (req, res) => {
       occupation,
       hobbies,
       habits,
-      budget: 0, 
-      profilePhoto: req.file ? `/uploads/${req.file.filename}` : "",
+      profilePhoto,
+      policeVerification
     });
+
 
     const savedUser = await newUser.save();
     res.status(201).json({
@@ -47,6 +68,7 @@ export const registerUser = async (req, res) => {
         fullName: savedUser.fullName,
         email: savedUser.email,
         profilePhoto: savedUser.profilePhoto,
+        policeVerification: savedUser.policeVerification,
       },
     });
   } catch (error) {
@@ -81,14 +103,23 @@ export const loginUser = async (req, res) => {
     });
 
     res.json({
-      message: "Login successful",
-      token,
-      user: {
-        id: user._id,
-        fullName: user.fullName,
-        email: user.email,
-      },
-    });
+  message: "Login successful",
+  token,
+  user: {
+    id: user._id,
+    fullName: user.fullName,
+    email: user.email,
+    gender: user.gender,
+    phone: user.phone,
+    city: user.city,
+    age: user.age,
+    occupation: user.occupation,
+    hobbies: user.hobbies,
+    habits: user.habits,
+    profilePhoto: user.profilePhoto,
+    policeVerification: user.policeVerification, // ✅ Include this
+  },
+});
   } catch (error) {
     res.status(500).json({ message: "Error logging in", error });
   }
@@ -169,7 +200,6 @@ export const changePassword = async (req, res) => {
     res.status(500).json({ message: "Error changing password", error: error.message });
   }
 };
-
 
 
 

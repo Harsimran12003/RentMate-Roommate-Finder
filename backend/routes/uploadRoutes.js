@@ -1,5 +1,6 @@
 import express from "express";
 import upload from "../middleware/upload.js";
+import { registerUser } from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -10,5 +11,8 @@ router.post("/", upload.single("file"), (req, res) => {
   }
   res.json({ url: `/uploads/${req.file.filename}` }); 
 });
+
+
+
 
 export default router;

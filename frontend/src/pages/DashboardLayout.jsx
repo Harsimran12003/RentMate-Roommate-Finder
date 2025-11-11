@@ -5,6 +5,7 @@ import { getUserProfile } from "../services/userService";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [tip, setTip] = useState("");
@@ -72,7 +73,7 @@ const Dashboard = () => {
       <Sidebar />
 
       {/* Main Dashboard */}
-      <div className="flex-1 p-8 space-y-8">
+      <div className="flex-1 p-8 space-y-5">
         {/* Animated Greeting Section */}
         <div className="relative bg-gradient-to-r from-blue-400 to-blue-600 rounded-2xl shadow-lg p-8 flex items-center">
           <div>
@@ -97,11 +98,6 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Daily Tip Card */}
-        <div className="bg-white dark:bg-gray-800 shadow-md rounded-xl p-6 animate-fadeIn">
-          <h2 className="text-2xl font-semibold mb-3">💡 Tip of the Day</h2>
-          <p className="text-gray-700 dark:text-gray-300">{tip}</p>
-        </div>
 
 {/* // Quick How-To Card (Replacing Habit Tracker) */}
 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 animate-fadeIn">
@@ -127,6 +123,27 @@ const Dashboard = () => {
   <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
     Follow these simple steps to get the most out of RentMate!
   </p>
+</div>
+
+{/* Disclaimer Section */}
+<div className="bg-white dark:bg-gray-800 shadow-md rounded-xl p-4 animate-fadeIn transition-all duration-300">
+  <div
+    onClick={() => setShowDisclaimer(!showDisclaimer)}
+    className="flex items-center justify-between cursor-pointer select-none"
+  >
+    <h2 className="text-2xl font-semibold text-red-500">⚠️ Disclaimer</h2>
+    <span className="text-sm text-blue-600 dark:text-blue-400">
+      {showDisclaimer ? "Hide" : "Read Disclaimer"}
+    </span>
+  </div>
+
+  {showDisclaimer && (
+    <p className="mt-3 text-gray-700 dark:text-gray-300 leading-relaxed transition-all duration-300">
+      RentMate is under active development and may not be fully verified.
+      Please verify all listings and profiles before making any commitments.
+      The developers are not liable for any misuse or discrepancies.
+    </p>
+  )}
 </div>
 
       </div>
