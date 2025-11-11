@@ -11,7 +11,7 @@ const Match = () => {
   const [matches, setMatches] = useState([]);
   const [cityFilter, setCityFilter] = useState("");
   const [genderFilter, setGenderFilter] = useState("");
-  const [nameFilter, setNameFilter] = useState(""); 
+  const [nameFilter, setNameFilter] = useState("");
   const [selectedMatch, setSelectedMatch] = useState(null);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const Match = () => {
     [matches]
   );
 
-  // Apply all filters together (city, gender, name)
+  // Apply filters
   const filteredMatches = useMemo(() => {
     return matches.filter((m) => {
       const cityOk = cityFilter ? m.city === cityFilter : true;
@@ -50,7 +50,6 @@ const Match = () => {
       const nameOk = nameFilter
         ? m.fullName?.toLowerCase().includes(nameFilter.toLowerCase())
         : true;
-
       return cityOk && genderOk && nameOk;
     });
   }, [matches, cityFilter, genderFilter, nameFilter]);
@@ -59,8 +58,9 @@ const Match = () => {
     <div className="flex min-h-screen bg-gradient-to-r from-[#DBEAFE] via-white to-[#EFF6FF]">
       <Sidebar />
 
-      <div className="flex-1 py-12 px-6">
-        <h1 className="text-4xl font-bold text-center text-[#1E3A8A] mb-10">
+      {/* Main Content */}
+      <div className="flex-1 py-8 px-4 sm:px-6 md:px-8 overflow-x-hidden">
+        <h1 className="text-3xl sm:text-4xl font-bold text-center text-[#1E3A8A] mb-8 sm:mb-10">
           Your Best Matches
         </h1>
 
@@ -68,21 +68,20 @@ const Match = () => {
           <p className="text-center text-gray-600">Loading...</p>
         ) : (
           <>
-            {/* Filters */}
-            <div className="max-w-5xl mx-auto mb-8 flex flex-wrap gap-4 justify-center">
-              {/*  Name search input */}
+            {/* Filters Section */}
+            <div className="max-w-6xl mx-auto mb-10 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center items-center">
               <input
                 type="text"
                 placeholder="Search by name..."
                 value={nameFilter}
                 onChange={(e) => setNameFilter(e.target.value)}
-                className="p-2 rounded-md border border-gray-300"
+                className="w-full sm:w-56 p-2 sm:p-2.5 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none text-sm sm:text-base"
               />
 
               <select
                 value={cityFilter}
                 onChange={(e) => setCityFilter(e.target.value)}
-                className="p-2 rounded-md border border-gray-300"
+                className="w-full sm:w-44 p-2 sm:p-2.5 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none text-sm sm:text-base"
               >
                 <option value="">All Cities</option>
                 {uniqueCities.map((city, i) => (
@@ -95,7 +94,7 @@ const Match = () => {
               <select
                 value={genderFilter}
                 onChange={(e) => setGenderFilter(e.target.value)}
-                className="p-2 rounded-md border border-gray-300"
+                className="w-full sm:w-44 p-2 sm:p-2.5 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none text-sm sm:text-base"
               >
                 <option value="">All Genders</option>
                 {uniqueGenders.map((g, i) => (
@@ -106,17 +105,17 @@ const Match = () => {
               </select>
             </div>
 
-            {/* Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-5xl mx-auto">
-              {filteredMatches.map((match) => (
-                <MatchCard
-                  key={match._id}
-                  match={match}
-                  onViewProfile={setSelectedMatch}
-                />
-              ))}
-
-              {filteredMatches.length === 0 && (
+            {/* Match Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
+              {filteredMatches.length > 0 ? (
+                filteredMatches.map((match) => (
+                  <MatchCard
+                    key={match._id}
+                    match={match}
+                    onViewProfile={setSelectedMatch}
+                  />
+                ))
+              ) : (
                 <p className="col-span-full text-center text-gray-600">
                   No matches found for the selected filters.
                 </p>
@@ -126,7 +125,7 @@ const Match = () => {
         )}
       </div>
 
-      {/* Profile Pane */}
+      {/* Profile Side Panel */}
       <AnimatePresence>
         {selectedMatch && (
           <ProfilePane

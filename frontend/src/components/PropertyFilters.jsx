@@ -6,7 +6,6 @@ export default function PropertyFilters({ onFilter }) {
 
   const handleFilter = (e) => {
     e.preventDefault();
-    // normalize to lowercase before sending
     onFilter({ state: state.toLowerCase(), city: city.toLowerCase() });
   };
 
@@ -17,31 +16,41 @@ export default function PropertyFilters({ onFilter }) {
   };
 
   return (
-    <form onSubmit={handleFilter} className="flex justify-center space-x-2 mb-8">
+    <form
+      onSubmit={handleFilter}
+      className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 mb-8 w-full px-4"
+    >
+      {/* State Input */}
       <input
         type="text"
         placeholder="Filter by State"
         value={state}
         onChange={(e) => setState(e.target.value)}
-        className="border px-3 py-2 rounded w-40"
+        className="border border-gray-300 px-3 py-2 rounded-lg w-full sm:w-40 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
+
+      {/* City Input */}
       <input
         type="text"
         placeholder="Filter by City"
         value={city}
         onChange={(e) => setCity(e.target.value)}
-        className="border px-3 py-2 rounded w-40"
+        className="border border-gray-300 px-3 py-2 rounded-lg w-full sm:w-40 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
+
+      {/* Apply Button */}
       <button
         type="submit"
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer"
+        className="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 transition text-white rounded-lg"
       >
         Apply
       </button>
+
+      {/* Clear Button */}
       <button
         type="button"
         onClick={handleClear}
-        className="px-4 py-2 bg-gray-500 text-white rounded-lg cursor-pointer"
+        className="w-full sm:w-auto px-4 py-2 bg-gray-500 hover:bg-gray-600 transition text-white rounded-lg"
       >
         Clear
       </button>

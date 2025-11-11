@@ -17,10 +17,9 @@ const ChatInput = ({
 }) => {
   const [preview, setPreview] = useState(null);
 
-  // Generate preview when file is selected
   useEffect(() => {
     if (!preview) return;
-    return () => URL.revokeObjectURL(preview.url); 
+    return () => URL.revokeObjectURL(preview.url);
   }, [preview]);
 
   const handleFileChange = (file) => {
@@ -37,15 +36,14 @@ const ChatInput = ({
 
   const handleSendClick = () => {
     handleSend();
-    removePreview(); 
+    removePreview();
   };
 
   return (
-    <div className="border-t px-6 py-4 bg-white flex flex-col gap-2 sticky bottom-0">
+    <div className="border-t px-4 md:px-6 py-3 bg-white flex flex-col gap-2 sticky bottom-0 z-10">
       {/* Preview Box */}
       {preview && (
         <div className="relative w-full max-w-xs p-2 rounded-lg border bg-gray-50 shadow-md">
-          {/* Remove Button */}
           <button
             onClick={removePreview}
             className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 cursor-pointer"
@@ -53,7 +51,6 @@ const ChatInput = ({
             <IoClose size={16} />
           </button>
 
-          {/* File Preview */}
           {preview.type.startsWith("image/") && (
             <img
               src={preview.url}
@@ -62,11 +59,7 @@ const ChatInput = ({
             />
           )}
           {preview.type.startsWith("video/") && (
-            <video
-              src={preview.url}
-              controls
-              className="max-h-40 rounded-md"
-            />
+            <video src={preview.url} controls className="max-h-40 rounded-md" />
           )}
           {preview.type.startsWith("audio/") && (
             <audio src={preview.url} controls className="w-full" />
@@ -75,10 +68,11 @@ const ChatInput = ({
       )}
 
       {/* Input Row */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 flex-wrap">
         <button
           onClick={() => setShowEmojiPicker((s) => !s)}
-          className="px-3 py-3 rounded-full bg-gray-200 hover:bg-gray-300 cursor-pointer"
+          className="px-3 py-2 rounded-full bg-gray-200 hover:bg-gray-300 cursor-pointer"
+          aria-label="Toggle emojis"
         >
           😄
         </button>
@@ -88,7 +82,7 @@ const ChatInput = ({
           placeholder="Type a message..."
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          className="flex-1 border rounded-full px-4 py-2 outline-none resize-none"
+          className="flex-1 min-h-[40px] max-h-40 border rounded-full px-4 py-2 outline-none resize-none"
         />
 
         {/* File Upload */}
@@ -100,7 +94,8 @@ const ChatInput = ({
         />
         <label
           htmlFor="fileInput"
-          className="cursor-pointer px-5 py-3 rounded-full bg-gray-200 hover:bg-gray-300"
+          className="cursor-pointer px-3 py-2 rounded-full bg-gray-200 hover:bg-gray-300"
+          title="Attach file"
         >
           <IoIosAttach />
         </label>
@@ -109,14 +104,16 @@ const ChatInput = ({
         {!isRecording ? (
           <button
             onClick={startRecording}
-            className="px-3 py-3 rounded-full bg-[#00796B] text-white hover:bg-green-600 cursor-pointer"
+            className="px-3 py-2 rounded-full bg-[#00796B] text-white hover:bg-green-600 cursor-pointer"
+            title="Record voice"
           >
             <IoIosMic />
           </button>
         ) : (
           <button
             onClick={stopRecording}
-            className="px-5 py-3 rounded-full bg-green-500 text-white hover:bg-green-600 animate-pulse cursor-pointer"
+            className="px-3 py-2 rounded-full bg-green-500 text-white hover:bg-green-600 animate-pulse cursor-pointer"
+            title="Stop recording"
           >
             <FaStop />
           </button>
@@ -125,7 +122,8 @@ const ChatInput = ({
         {/* Send Button */}
         <button
           onClick={handleSendClick}
-          className="bg-[#00796B] text-white px-5 py-3 rounded-full hover:bg-[#004D40] transition-all cursor-pointer"
+          className="bg-[#00796B] text-white px-4 py-2 rounded-full hover:bg-[#004D40] transition-all cursor-pointer"
+          title="Send"
         >
           <IoSend />
         </button>

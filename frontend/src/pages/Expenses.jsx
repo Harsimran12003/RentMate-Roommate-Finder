@@ -27,7 +27,7 @@ const Expenses = () => {
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
-  //  Utility: group expenses by month
+  // Utility: group expenses by month
   const groupByMonth = (expenses) => {
     const grouped = {};
     expenses.forEach((exp) => {
@@ -46,7 +46,7 @@ const Expenses = () => {
     return grouped;
   };
 
-  //  Load Groups
+  // Load Groups
   useEffect(() => {
     const load = async () => {
       const data = await fetchGroups();
@@ -56,7 +56,7 @@ const Expenses = () => {
     load();
   }, []);
 
-  //  Load Members
+  // Load Members
   useEffect(() => {
     if (!selectedGroup) return;
     const loadMembers = async () => {
@@ -66,7 +66,7 @@ const Expenses = () => {
     loadMembers();
   }, [selectedGroup]);
 
-  // 🔹 Load Expenses
+  // Load Expenses
   useEffect(() => {
     if (!selectedGroup) return;
     const loadExpenses = async () => {
@@ -83,7 +83,7 @@ const Expenses = () => {
     loadExpenses();
   }, [selectedGroup]);
 
-  //  Add Expense
+  // Add Expense
   const handleAddExpense = async (newExpense) => {
     const created = await addExpense({
       ...newExpense,
@@ -93,7 +93,7 @@ const Expenses = () => {
     setExpenses([...expenses, created]);
   };
 
-  //  Delete Expense
+  // Delete Expense
   const handleDeleteExpense = async (id) => {
     if (!window.confirm("Delete this expense?")) return;
     await deleteExpense(id);
@@ -101,45 +101,55 @@ const Expenses = () => {
   };
 
   const groupedExpenses = groupByMonth(expenses);
-  const total = expenses.reduce(
-    (sum, exp) => sum + (Number(exp.amount) || 0),
-    0
-  );
+  const total = expenses.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <div className="flex-1 min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-50 px-8 py-10">
-        <h1 className="text-3xl font-bold text-center mb-10 text-[#1565C0]">
+    <div className="flex flex-col md:flex-row min-h-screen">
+      {/* Sidebar */}
+      <div className="w-full md:w-64">
+        <Sidebar />
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 bg-gradient-to-br from-blue-100 via-white to-blue-50 px-4 sm:px-6 md:px-8 py-8 overflow-x-hidden">
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 text-[#1565C0]">
           Shared Expenses
         </h1>
 
         {/* Groups Section */}
-        <GroupSection
-          groups={groups}
-          setGroups={setGroups}
-          selectedGroup={selectedGroup}
-          setSelectedGroup={setSelectedGroup}
-          currentUser={currentUser}
-          createGroup={createGroup}
-          deleteGroup={deleteGroup}
-          searchUsers={searchUsers}
-        />
+        <div className="mb-8">
+          <GroupSection
+            groups={groups}
+            setGroups={setGroups}
+            selectedGroup={selectedGroup}
+            setSelectedGroup={setSelectedGroup}
+            currentUser={currentUser}
+            createGroup={createGroup}
+            deleteGroup={deleteGroup}
+            searchUsers={searchUsers}
+          />
+        </div>
 
         {/* Expense Section */}
         {selectedGroup && (
-          <div className="max-w-5xl mx-auto">
-            <AddExpenseForm
-              members={members}
-              onAddExpense={handleAddExpense}
-            />
-            <ExpenseHistory
-              groupedExpenses={groupedExpenses}
-              loading={loading}
-              total={total}
-              onDelete={handleDeleteExpense}
-            />
-            <ExpenseAnalytics expenses={expenses} groupedExpenses={groupedExpenses} />
+          <div className="max-w-5xl mx-auto w-full space-y-8">
+            <AddExpenseForm members={members} onAddExpense={handleAddExpense} />
+
+            <div className="overflow-x-auto">
+              <ExpenseHistory
+                groupedExpenses={groupedExpenses}
+                loading={loading}
+                total={total}
+                onDelete={handleDeleteExpense}
+              />
+            </div>
+
+            <div className="w-full">
+              <ExpenseAnalytics
+                expenses={expenses}
+                groupedExpenses={groupedExpenses}
+              />
+            </div>
           </div>
         )}
       </div>

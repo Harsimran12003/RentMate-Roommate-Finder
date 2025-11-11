@@ -17,10 +17,8 @@ const Login = () => {
 
     try {
       const data = await loginUser({ email, password });
-      // Save token in localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
@@ -30,16 +28,30 @@ const Login = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 to-white">
       <Navbar />
-      <div className="flex flex-1 items-center justify-center px-4">
-        <div className="flex w-[70%] h-[440px] max-w-5xl rounded-3xl overflow-hidden shadow-2xl bg-white/40 backdrop-blur-lg">
-          <div className="w-1/2 hidden md:flex items-center justify-center bg-white p-6">
-            <img src={loginIllustration} alt="Login" className="max-w-full h-auto" />
+
+      <div className="flex flex-1 items-center justify-center px-4 py-8 sm:py-12">
+        {/* Main Card */}
+        <div className="flex flex-col md:flex-row w-full md:w-[80%] lg:w-[70%] xl:w-[60%] rounded-3xl overflow-hidden shadow-2xl bg-white/50 backdrop-blur-lg">
+
+          {/* Left Illustration */}
+          <div className="hidden md:flex w-1/2 items-center justify-center bg-white p-6">
+            <img
+              src={loginIllustration}
+              alt="Login Illustration"
+              className="w-3/4 max-w-[350px] h-auto"
+            />
           </div>
 
-          <div className="w-full md:w-1/2 p-10">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">Welcome Back</h2>
-            {error && <p className="text-red-500 mb-4">{error}</p>}
-            <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Right Form */}
+          <div className="w-full md:w-1/2 p-6 sm:p-8 md:p-10 flex flex-col justify-center">
+            <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center md:text-left">
+              Welcome Back 👋
+            </h2>
+
+            {error && <p className="text-red-500 mb-4 text-center md:text-left">{error}</p>}
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Email */}
               <div>
                 <label className="block mb-2 text-gray-700">Email</label>
                 <input
@@ -51,6 +63,8 @@ const Login = () => {
                   required
                 />
               </div>
+
+              {/* Password */}
               <div>
                 <label className="block mb-2 text-gray-700">Password</label>
                 <div className="relative">
@@ -69,7 +83,6 @@ const Login = () => {
                     tabIndex={-1}
                   >
                     {showPassword ? (
-                      // Eye Open Icon
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-5 w-5"
@@ -93,7 +106,6 @@ const Login = () => {
                         />
                       </svg>
                     ) : (
-                      // Eye Closed Icon
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-5 w-5"
@@ -117,6 +129,8 @@ const Login = () => {
                   </button>
                 </div>
               </div>
+
+              {/* Submit Button */}
               <button
                 type="submit"
                 className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-lg font-semibold transition-all"
@@ -124,9 +138,11 @@ const Login = () => {
                 Login
               </button>
             </form>
-            <p className="mt-6 text-center text-gray-600">
+
+            {/* Footer Text */}
+            <p className="mt-6 text-center text-gray-600 text-sm sm:text-base">
               Don't have an account?{" "}
-              <Link to="/register" className="text-blue-500 hover:underline">
+              <Link to="/register" className="text-blue-500 hover:underline font-medium">
                 Register Now
               </Link>
             </p>

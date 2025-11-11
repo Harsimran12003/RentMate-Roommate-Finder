@@ -28,6 +28,8 @@ const ChatPage = () => {
   const audioChunksRef = useRef([]);
   const bottomRef = useRef(null);
 
+  const [mobileOpen, setMobileOpen] = useState(false); // <-- mobile chat list toggle
+
   const currentUser = JSON.parse(localStorage.getItem("user")) || {};
 
   // --- Preview Handler ---
@@ -49,6 +51,7 @@ const ChatPage = () => {
       setSelectedChat((prev) =>
         prev?._id === paramChatId ? prev : { _id: paramChatId }
       );
+      setMobileOpen(false); // close list on navigation (mobile)
     }
   }, [paramChatId]);
 
@@ -85,7 +88,7 @@ const ChatPage = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // --- Format headers ---
+  // --- Format headers / grouping (unchanged) ---
   const formatDateLabel = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -103,7 +106,6 @@ const ChatPage = () => {
     return date.toLocaleDateString();
   };
 
-  // --- Group messages ---
   const groupedMessages = (Array.isArray(messages) ? messages : []).reduce(
     (groups, msg) => {
       const date = new Date(msg.createdAt || msg.timestamp).toDateString();
@@ -165,7 +167,7 @@ const ChatPage = () => {
       const audioFile = new File([blob], `recording-${Date.now()}.mp3`, {
         type: "audio/mp3",
       });
-      handleFileChange(audioFile); 
+      handleFileChange(audioFile);
     };
 
     mediaRecorderRef.current.start();
@@ -178,16 +180,29 @@ const ChatPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <ChatList />
-      <div className="flex-1 flex flex-col bg-gradient-to-r from-[#F3F4F6] to-[#E0F2F1] h-screen">
+    <div className="flex min-h-screen bg-white">
+      {/* Hide main sidebar on small screens, keep for md+ */}
+      <div className="hidden md:block">
+        <Sidebar />
+      </div>
+
+      {/* Chat List: visible on md, on mobile shows as overlay controlled by mobileOpen */}
+      <ChatList
+        mobileOpen={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+      />
+
+      {/* Main chat area */}
+      <div className="flex-1 flex flex-col bg-gradient-to-r from-[#F3F4F6] to-[#E0F2F1] h-screen relative">
+        <ChatHeader
+          otherUser={getOtherUser(selectedChat)}
+          onOpenList={() => setMobileOpen(true)} // opens mobile chat list
+        />
+
         {selectedChat?._id ? (
           <>
-            <ChatHeader otherUser={getOtherUser(selectedChat)} />
-
             {/* Messages */}
-            <div className="flex-1 p-6 overflow-y-auto space-y-6 custom-scrollbar">
+            <div className="flex-1 p-4 md:p-6 overflow-y-auto space-y-6 custom-scrollbar">
               {sortedDates.map((date, i) => (
                 <div key={i}>
                   <div className="sticky top-2 z-10 mb-5 flex justify-center">
@@ -210,7 +225,7 @@ const ChatPage = () => {
 
             {/* File/Audio Preview */}
             {preview && (
-              <div className="relative w-full max-w-xs mx-6 mb-2 p-2 rounded-lg border bg-gray-50 shadow-md">
+              <div className="relative w-full max-w-xs mx-4 md:mx-6 mb-2 p-2 rounded-lg border bg-gray-50 shadow-md">
                 <button
                   onClick={removePreview}
                   className=" bg-red-500 text-white rounded-full p-1 hover:bg-red-600 cursor-pointer float-right "
@@ -244,12 +259,12 @@ const ChatPage = () => {
               isRecording={isRecording}
               startRecording={startRecording}
               stopRecording={stopRecording}
-              setFile={setFile}  
+              setFile={setFile}
             />
 
             {/* Emoji Picker */}
             {showEmojiPicker && (
-              <div className="absolute bottom-20 left-10 bg-white shadow-lg rounded-lg z-50">
+              <div className="absolute bottom-28 left-4 md:left-10 bg-white shadow-lg rounded-lg z-50">
                 <EmojiPicker
                   onEmojiClick={(emoji) =>
                     setNewMessage((p) => p + emoji?.emoji)

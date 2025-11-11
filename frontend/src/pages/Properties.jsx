@@ -34,18 +34,14 @@ const Properties = () => {
   });
 
   const [editingId, setEditingId] = useState(null);
-  const [activeTab, setActiveTab] = useState("all"); // all | my | add
+  const [activeTab, setActiveTab] = useState("all");
 
-  // Fetch properties
   const loadProperties = async (state = "", city = "") => {
     try {
       setLoading(true);
       let data = [];
-      if (activeTab === "my") {
-        data = await fetchMyProperties();
-      } else {
-        data = await fetchProperties(state, city);
-      }
+      if (activeTab === "my") data = await fetchMyProperties();
+      else data = await fetchProperties(state, city);
       setProperties(data);
       setStateFilter(state);
       setCityFilter(city);
@@ -60,7 +56,6 @@ const Properties = () => {
     loadProperties(stateFilter, cityFilter);
   }, [activeTab]);
 
-  // Delete property
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this property?")) return;
     try {
@@ -71,7 +66,6 @@ const Properties = () => {
     }
   };
 
-  // Add or Update property
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -83,10 +77,7 @@ const Properties = () => {
         setEditingId(null);
       } else {
         const added = await addProperty(newProperty);
-        // If currently in 'my' tab, show the new property immediately
-        if (activeTab === "my") {
-          setProperties([...properties, added]);
-        }
+        if (activeTab === "my") setProperties([...properties, added]);
       }
 
       setNewProperty({
@@ -99,13 +90,12 @@ const Properties = () => {
         tags: [],
         image: null,
       });
-      setActiveTab("my"); // switch to My Properties after adding
+      setActiveTab("my");
     } catch (error) {
       console.error("Error saving property:", error);
     }
   };
 
-  // Prefill form on edit
   const handleEdit = (property) => {
     setNewProperty({
       title: property.title,
@@ -122,7 +112,7 @@ const Properties = () => {
       image: null,
     });
     setEditingId(property._id);
-    setActiveTab("add"); // edit happens in add tab
+    setActiveTab("add");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -145,70 +135,70 @@ const Properties = () => {
     setShowDetails(true);
   };
 
-  if (loading) return <p>Loading properties...</p>;
+  if (loading) return <p className="text-center mt-10">Loading properties...</p>;
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
+      {/* Sidebar */}
       <Sidebar />
 
-      <div className="flex-1 p-8 bg-gradient-to-br from-blue-100 via-white to-blue-50 relative">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-10">
+      <div className="flex-1 p-4 sm:p-6 md:p-8 bg-gradient-to-br from-blue-100 via-white to-blue-50">
+        <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6 sm:mb-10">
           Properties
         </h1>
 
         {/* Tabs */}
-        <div className="flex justify-center space-x-4 mb-6">
-          <button
-            onClick={() => setActiveTab("all")}
-            className={`px-4 py-2 rounded-lg shadow font-medium ${
-              activeTab === "all" ? "bg-blue-600 text-white" : "bg-gray-200"
-            }`}
-          >
-            All Properties
-          </button>
-          <button
-            onClick={() => setActiveTab("my")}
-            className={`px-4 py-2 rounded-lg shadow font-medium ${
-              activeTab === "my" ? "bg-blue-600 text-white" : "bg-gray-200"
-            }`}
-          >
-            My Properties
-          </button>
-          <button
-            onClick={() => setActiveTab("add")}
-            className={`px-4 py-2 rounded-lg shadow font-medium ${
-              activeTab === "add" ? "bg-blue-600 text-white" : "bg-gray-200"
-            }`}
-          >
-            Add Property
-          </button>
+        <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-6">
+          {["all", "my", "add"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 rounded-lg shadow font-medium transition-all ${
+                activeTab === tab
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+              }`}
+            >
+              {tab === "all"
+                ? "All Properties"
+                : tab === "my"
+                ? "My Properties"
+                : "Add Property"}
+            </button>
+          ))}
         </div>
 
         {/* Filters */}
         {activeTab === "all" && (
-          <PropertyFilters
-            onFilter={({ state, city }) => loadProperties(state, city)}
-          />
+          <div className="mb-6">
+            <PropertyFilters onFilter={({ state, city }) => loadProperties(state, city)} />
+          </div>
         )}
 
         {/* Add / Edit Form */}
         {activeTab === "add" && (
-          <PropertyForm
-            newProperty={newProperty}
-            setNewProperty={setNewProperty}
-            editingId={editingId}
-            handleSubmit={handleSubmit}
-            handleCancel={handleCancel}
-          />
+          <div className="mb-8">
+            <PropertyForm
+              newProperty={newProperty}
+              setNewProperty={setNewProperty}
+              editingId={editingId}
+              handleSubmit={handleSubmit}
+              handleCancel={handleCancel}
+            />
+          </div>
         )}
 
         {/* Property Cards */}
-        {(activeTab === "all" || activeTab === "my") &&
-          (properties.length === 0 ? (
-            <p className="text-center text-gray-600">No properties found.</p>
-          ) : (
-            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {properties.map((property) => (
+        {(activeTab === "all" || activeTab === "my") && (
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          >
+            {properties.length === 0 ? (
+              <p className="col-span-full text-center text-gray-600">
+                No properties found.
+              </p>
+            ) : (
+              properties.map((property) => (
                 <PropertyCard
                   key={property._id}
                   property={property}
@@ -217,11 +207,12 @@ const Properties = () => {
                   onDelete={handleDelete}
                   onViewDetails={() => onViewDetails(property._id)}
                 />
-              ))}
-            </div>
-          ))} 
+              ))
+            )}
+          </div>
+        )}
 
-        {/* Side Drawer */}
+        {/* Details Drawer */}
         {showDetails && selectedPropertyId && (
           <PropertyDetails
             propertyId={selectedPropertyId}

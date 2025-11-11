@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
-import { getUserProfile, updateUserProfile, changeUserPassword } from "../services/profileService"; // ✅ include new service
+import {
+  getUserProfile,
+  updateUserProfile,
+  changeUserPassword,
+} from "../services/profileService";
 
 const API_BASE = "http://localhost:5000";
 
@@ -57,7 +61,6 @@ const Profile = () => {
   const [profileFile, setProfileFile] = useState(null);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
-  // new password state
   const [passwords, setPasswords] = useState({
     current: "",
     new: "",
@@ -101,7 +104,7 @@ const Profile = () => {
         : [...prev[field], value];
       return { ...prev, [field]: updated };
     });
-  }; 
+  };
 
   const handleSave = async () => {
     try {
@@ -160,7 +163,7 @@ const Profile = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        Loading profile... 
+        Loading profile...
       </div>
     );
   }
@@ -168,18 +171,17 @@ const Profile = () => {
   return (
     <div className="flex bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
       <Sidebar />
-      <div className="flex-1 p-6 flex items-center justify-center">
-        <div className="w-full max-w-6xl bg-white shadow-2xl rounded-3xl p-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
-          
-          {/* 🔹 LinkedIn Style Left Profile Card */}
-          <div className="col-span-1 relative bg-gray-50 rounded-2xl shadow-md overflow-hidden">
-            <div className="h-28 bg-gradient-to-r from-blue-300 via-blue-400 to-blue-500"></div>
+      <div className="flex-1 p-4 sm:p-6 flex items-center justify-center overflow-auto">
+        <div className="w-full max-w-6xl bg-white shadow-2xl rounded-3xl p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-10">
+          {/* Left Profile Card */}
+          <div className="col-span-1 relative bg-gray-50 rounded-2xl shadow-md overflow-hidden text-center">
+            <div className="h-24 sm:h-28 bg-gradient-to-r from-blue-300 via-blue-400 to-blue-500"></div>
 
-            <div className="absolute top-14 left-1/2 -translate-x-1/2">
+            <div className="absolute top-12 sm:top-14 left-1/2 -translate-x-1/2">
               <img
                 src={user?.profilePic || "/default-avatar.png"}
                 alt={user.name || "Profile photo"}
-                className="w-28 h-28 rounded-full border-4 border-white shadow-md object-cover"
+                className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-white shadow-md object-cover"
                 onError={(e) => (e.currentTarget.src = "/default-avatar.png")}
               />
               {isEditing && (
@@ -187,14 +189,14 @@ const Profile = () => {
                   type="file"
                   accept="image/*"
                   onChange={handleProfilePicChange}
-                  className="mt-3 text-sm text-gray-600"
+                  className="mt-3 text-sm text-gray-600 block mx-auto"
                 />
               )}
             </div>
 
-            <div className="mt-20 text-center px-4 pb-6">
-              <h2 className="text-xl font-bold text-gray-800">{user.name}</h2>
-              <p className="text-gray-500">{user.occupation}</p>
+            <div className="mt-20 sm:mt-24 px-4 pb-6">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-800">{user.name}</h2>
+              <p className="text-gray-500 text-sm sm:text-base">{user.occupation}</p>
               <div className="mt-4 space-y-1 text-gray-600 text-sm">
                 <p>📍 {user.city}</p>
                 <p>📧 {user.email}</p>
@@ -203,7 +205,7 @@ const Profile = () => {
 
               <button
                 onClick={() => setIsPasswordModalOpen(true)}
-                className="mt-5 bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg shadow-md transition cursor-pointer"
+                className="mt-5 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md transition text-sm sm:text-base"
               >
                 Change Password
               </button>
@@ -217,60 +219,27 @@ const Profile = () => {
             )}
 
             <div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4 border-b pb-2">
                 Profile Information
               </h3>
-              <div className="grid grid-cols-2 gap-5 text-gray-700">
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 text-gray-700">
                 {isEditing ? (
                   <>
-                    <EditableField
-                      label="Name"
-                      name="name"
-                      value={user.name}
-                      onChange={handleChange}
-                    />
-                    <EditableField
-                      label="Email"
-                      name="email"
-                      value={user.email}
-                      onChange={handleChange}
-                    />
-                    <EditableField
-                      label="Phone"
-                      name="phone"
-                      value={user.phone}
-                      onChange={handleChange}
-                    />
-                    <EditableField
-                      label="City"
-                      name="city"
-                      value={user.city}
-                      onChange={handleChange}
-                    />
-                    <EditableField
-                      label="Age"
-                      name="age"
-                      value={user.age}
-                      onChange={handleChange}
-                    />
-                    <EditableField
-                      label="Gender"
-                      name="gender"
-                      value={user.gender}
-                      onChange={handleChange}
-                    />
-                    <EditableField
-                      label="Occupation"
-                      name="occupation"
-                      value={user.occupation}
-                      onChange={handleChange}
-                    />
+                    {["name", "email", "phone", "city", "age", "gender", "occupation"].map((field) => (
+                      <EditableField
+                        key={field}
+                        label={field.charAt(0).toUpperCase() + field.slice(1)}
+                        name={field}
+                        value={user[field]}
+                        onChange={handleChange}
+                      />
+                    ))}
 
-                    {/* Roommate Status */}
                     <div>
                       <p className="text-sm text-gray-500">Roommate Status</p>
-                      <div className="mt-2 flex gap-4">
-                        <label className="flex items-center gap-2">
+                      <div className="mt-2 flex flex-col sm:flex-row gap-2 sm:gap-4">
+                        <label className="flex items-center gap-2 text-sm">
                           <input
                             type="radio"
                             name="roommateStatus"
@@ -280,7 +249,7 @@ const Profile = () => {
                           />
                           Looking for roommate
                         </label>
-                        <label className="flex items-center gap-2">
+                        <label className="flex items-center gap-2 text-sm">
                           <input
                             type="radio"
                             name="roommateStatus"
@@ -295,23 +264,24 @@ const Profile = () => {
                   </>
                 ) : (
                   <>
-                    <ProfileField label="Name" value={user.name} />
-                    <ProfileField label="Email" value={user.email} />
-                    <ProfileField label="Phone" value={user.phone} />
-                    <ProfileField label="City" value={user.city} />
-                    <ProfileField label="Age" value={user.age} />
-                    <ProfileField label="Gender" value={user.gender} />
-                    <ProfileField label="Occupation" value={user.occupation} />
-                    <ProfileField
-                      label="Roommate Status"
-                      value={user.roommateStatus}
-                    />
+                    {[
+                      ["Name", user.name],
+                      ["Email", user.email],
+                      ["Phone", user.phone],
+                      ["City", user.city],
+                      ["Age", user.age],
+                      ["Gender", user.gender],
+                      ["Occupation", user.occupation],
+                      ["Roommate Status", user.roommateStatus],
+                    ].map(([label, value]) => (
+                      <ProfileField key={label} label={label} value={value} />
+                    ))}
                   </>
                 )}
               </div>
 
               {/* Hobbies & Habits */}
-              <div className="grid grid-cols-2 gap-6 mt-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
                 <div>
                   <h4 className="text-lg font-semibold text-blue-600 mb-2">
                     Hobbies
@@ -330,11 +300,11 @@ const Profile = () => {
                             .filter(Boolean),
                         }))
                       }
-                      className="w-full border rounded-lg px-2 py-1 mt-1"
+                      className="w-full border rounded-lg px-2 py-1 mt-1 text-sm"
                       placeholder="Enter hobbies separated by commas"
                     />
                   ) : (
-                    <ul className="list-disc list-inside text-gray-700 space-y-1">
+                    <ul className="list-disc list-inside text-gray-700 space-y-1 text-sm">
                       {(user.hobbies || []).map((item, index) => (
                         <li key={index}>{item}</li>
                       ))}
@@ -346,25 +316,20 @@ const Profile = () => {
                     Habits
                   </h4>
                   {isEditing ? (
-                    <div className="space-y-2">
+                    <div className="space-y-2 text-sm">
                       {habitsOptions.map((habit) => (
-                        <label
-                          key={habit}
-                          className="flex items-center space-x-2"
-                        >
+                        <label key={habit} className="flex items-center space-x-2">
                           <input
                             type="checkbox"
                             checked={(user.habits || []).includes(habit)}
-                            onChange={() =>
-                              handleCheckboxChange("habits", habit)
-                            }
+                            onChange={() => handleCheckboxChange("habits", habit)}
                           />
                           <span>{habit}</span>
                         </label>
                       ))}
                     </div>
                   ) : (
-                    <ul className="list-disc list-inside text-gray-700 space-y-1">
+                    <ul className="list-disc list-inside text-gray-700 space-y-1 text-sm">
                       {(user.habits || []).map((item, index) => (
                         <li key={index}>{item}</li>
                       ))}
@@ -374,19 +339,19 @@ const Profile = () => {
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="mt-6 text-right space-x-3">
+            {/* Buttons */}
+            <div className="mt-6 text-right space-x-2 sm:space-x-3">
               {isEditing ? (
                 <>
                   <button
                     onClick={handleSave}
-                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg shadow-md transition cursor-pointer"
+                    className="bg-green-500 hover:bg-green-600 text-white px-4 sm:px-6 py-2 rounded-lg shadow-md transition text-sm sm:text-base"
                   >
                     Save
                   </button>
                   <button
                     onClick={() => setIsEditing(false)}
-                    className="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-lg shadow-md transition cursor-pointer"
+                    className="bg-gray-400 hover:bg-gray-500 text-white px-4 sm:px-6 py-2 rounded-lg shadow-md transition text-sm sm:text-base"
                   >
                     Cancel
                   </button>
@@ -394,7 +359,7 @@ const Profile = () => {
               ) : (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md transition cursor-pointer"
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 sm:px-6 py-2 rounded-lg shadow-md transition text-sm sm:text-base"
                 >
                   Edit Profile
                 </button>
@@ -404,36 +369,43 @@ const Profile = () => {
         </div>
       </div>
 
-
-      {/* 🔹 Password Modal */}
+      {/* Password Modal */}
       {isPasswordModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Change Password</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 w-full max-w-md relative">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">
+              Change Password
+            </h2>
 
             <input
               type="password"
               placeholder="Current Password"
               value={passwords.current}
-              onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
-              className="w-full border rounded-lg px-3 py-2 mb-3"
+              onChange={(e) =>
+                setPasswords({ ...passwords, current: e.target.value })
+              }
+              className="w-full border rounded-lg px-3 py-2 mb-3 text-sm"
             />
             <input
               type="password"
               placeholder="New Password"
               value={passwords.new}
-              onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
-              className="w-full border rounded-lg px-3 py-2 mb-3"
+              onChange={(e) =>
+                setPasswords({ ...passwords, new: e.target.value })
+              }
+              className="w-full border rounded-lg px-3 py-2 mb-3 text-sm"
             />
             <input
               type="password"
               placeholder="Confirm New Password"
               value={passwords.confirm}
-              onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
-              className="w-full border rounded-lg px-3 py-2 mb-4"
+              onChange={(e) =>
+                setPasswords({ ...passwords, confirm: e.target.value })
+              }
+              className="w-full border rounded-lg px-3 py-2 mb-4 text-sm"
             />
 
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-end gap-3 text-sm sm:text-base">
               <button
                 onClick={() => setIsPasswordModalOpen(false)}
                 className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition"
@@ -456,20 +428,22 @@ const Profile = () => {
 
 const ProfileField = ({ label, value }) => (
   <div>
-    <p className="text-sm text-gray-500">{label}</p>
-    <p className="font-medium text-gray-800">{String(value ?? "")}</p>
+    <p className="text-xs sm:text-sm text-gray-500">{label}</p>
+    <p className="font-medium text-gray-800 text-sm sm:text-base">
+      {String(value ?? "")}
+    </p>
   </div>
 );
 
 const EditableField = ({ label, name, value, onChange }) => (
   <div>
-    <p className="text-sm text-gray-500">{label}</p>
+    <p className="text-xs sm:text-sm text-gray-500">{label}</p>
     <input
       type="text"
       name={name}
       value={String(value ?? "")}
       onChange={onChange}
-      className="w-full border rounded-lg px-2 py-1 mt-1"
+      className="w-full border rounded-lg px-2 py-1 mt-1 text-sm"
     />
   </div>
 );
