@@ -13,25 +13,20 @@ import groupRoutes from "./routes/groupRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
-import socketHandler from "./socket/socket.js"; 
 
+// Load environment variables
 dotenv.config();
+
 const app = express();
 
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
     credentials: true,
   })
 );
 app.use(express.json());
-
-// HTTP server
-const server = http.createServer(app);
-
-// Initialize Socket.IO 
-socketHandler(server);
 
 // MongoDB connection
 mongoose
@@ -39,15 +34,16 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Routes
+// Static uploads folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// API Routes
 app.use("/api/users", userRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/matches", matchRoutes);
@@ -57,12 +53,22 @@ app.use("/api/chats", chatRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/groups", groupRoutes);
 
-
 // Root route
 app.get("/", (req, res) => {
-  res.send("RentMate API is running...");
+  res.send("🏠 RentMate API is running...");
 });
 
-// Start server
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// ✅ If running locally → start HTTP + Socket.IO server
+if (process.env.NODE_ENV !== "production") {
+  const server = http.createServer(app);
+  const { default: socketHandler } = await import("./socket/socket.js");
+  socketHandler(server);
+
+  const PORT = process.env.PORT || 5000;
+  server.listen(PORT, () =>
+    console.log(`🚀 Server running locally on port ${PORT}`)
+  );
+}
+
+// ✅ If on Vercel → export app only (no server.listen)
+export default app;
