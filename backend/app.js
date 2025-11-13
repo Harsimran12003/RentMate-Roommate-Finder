@@ -1,5 +1,4 @@
 import express from "express";
-import http from "http";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -13,25 +12,19 @@ import groupRoutes from "./routes/groupRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
-import socketHandler from "./socket/socket.js"; 
 
 dotenv.config();
+
 const app = express();
 
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
     credentials: true,
   })
 );
 app.use(express.json());
-
-// HTTP server
-const server = http.createServer(app);
-
-// Initialize Socket.IO 
-socketHandler(server);
 
 // MongoDB connection
 mongoose
@@ -39,8 +32,8 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -57,13 +50,10 @@ app.use("/api/chats", chatRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/groups", groupRoutes);
 
-
 // Root route
 app.get("/", (req, res) => {
-  res.send("RentMate API is running...");
+  res.send("🏠 RentMate API is running...");
 });
 
-// Start server
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// ✅ Export only app (Vercel will use this)
 export default app;
