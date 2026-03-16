@@ -11,9 +11,7 @@ import chatRoutes from "./routes/chatRoutes.js";
 import expenseRoutes from "./routes/expenseRoutes.js";
 import groupRoutes from "./routes/groupRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
-import path from "path";
-import { fileURLToPath } from "url";
-import socketHandler from "./socket/socket.js"; 
+import socketHandler from "./socket/socket.js";
 
 dotenv.config();
 const app = express();
@@ -21,16 +19,19 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://rent-mate-roommate-finder.vercel.app/",
+    ],
     credentials: true,
-  })
+  }),
 );
 app.use(express.json());
 
 // HTTP server
 const server = http.createServer(app);
 
-// Initialize Socket.IO 
+// Initialize Socket.IO
 socketHandler(server);
 
 // MongoDB connection
@@ -42,8 +43,6 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-
-
 // Routes
 
 app.use("/api/users", userRoutes);
@@ -54,7 +53,6 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/groups", groupRoutes);
-
 
 // Root route
 app.get("/", (req, res) => {
