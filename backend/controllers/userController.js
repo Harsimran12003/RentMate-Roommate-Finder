@@ -124,7 +124,11 @@ export const loginUser = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: "Error logging in", error });
+    console.error("LOGIN ERROR:", error);
+    res.status(500).json({
+      message: "Error logging in",
+      error: error.message,
+    });
   }
 };
 
@@ -152,7 +156,7 @@ export const updateUserProfile = async (req, res) => {
     }
 
     if (req.file) {
-      updates.profilePhoto = req.file.path ;
+      updates.profilePhoto = req.file.path;
     }
 
     const updatedUser = await User.findByIdAndUpdate(req.user._id, updates, {
