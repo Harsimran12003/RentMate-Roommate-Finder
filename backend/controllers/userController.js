@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// Register a new user 
+// Register a new user
 
 export const registerUser = async (req, res) => {
   try {
@@ -17,11 +17,13 @@ export const registerUser = async (req, res) => {
       city,
       occupation,
       hobbies,
-      habits
+      habits,
     } = req.body;
 
     if (!fullName || !email || !password) {
-      return res.status(400).json({ message: "Full name, email, and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Full name, email, and password are required" });
     }
     if (password !== confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
@@ -38,13 +40,14 @@ export const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const profilePhoto = req.files?.profilePhoto
-      ? `/uploads/${req.files.profilePhoto[0].filename}`
-      : "";
-    const policeVerification = req.files?.policeVerification
-      ? `/uploads/${req.files.policeVerification[0].filename}`
+      ? req.files.profilePhoto[0].path
       : "";
 
-const newUser = new User({
+    const policeVerification = req.files?.policeVerification
+      ? req.files.policeVerification[0].path
+      : "";
+
+    const newUser = new User({
       fullName,
       email,
       password: hashedPassword,
@@ -56,9 +59,8 @@ const newUser = new User({
       hobbies,
       habits,
       profilePhoto,
-      policeVerification
+      policeVerification,
     });
-
 
     const savedUser = await newUser.save();
     res.status(201).json({
@@ -72,10 +74,11 @@ const newUser = new User({
       },
     });
   } catch (error) {
-    res.status(500).json({ message: "Error registering user", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error registering user", error: error.message });
   }
 };
-
 
 // Login user
 export const loginUser = async (req, res) => {
@@ -103,27 +106,26 @@ export const loginUser = async (req, res) => {
     });
 
     res.json({
-  message: "Login successful",
-  token,
-  user: {
-    id: user._id,
-    fullName: user.fullName,
-    email: user.email,
-    gender: user.gender,
-    phone: user.phone,
-    city: user.city,
-    age: user.age,
-    occupation: user.occupation,
-    hobbies: user.hobbies,
-    habits: user.habits,
-    profilePhoto: user.profilePhoto,
-    policeVerification: user.policeVerification, // ✅ Include this
-  },
-});
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        gender: user.gender,
+        phone: user.phone,
+        city: user.city,
+        age: user.age,
+        occupation: user.occupation,
+        hobbies: user.hobbies,
+        habits: user.habits,
+        profilePhoto: user.profilePhoto,
+        policeVerification: user.policeVerification, // ✅ Include this
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: "Error logging in", error });
   }
-  
 };
 
 // Get user profile
@@ -138,7 +140,6 @@ export const getUserProfile = async (req, res) => {
   }
 };
 
-
 // Update user profile
 export const updateUserProfile = async (req, res) => {
   try {
@@ -146,12 +147,12 @@ export const updateUserProfile = async (req, res) => {
 
     if (updates.habits) {
       if (typeof updates.habits === "string") {
-        updates.habits = updates.habits.split(",").map(h => h.trim());
+        updates.habits = updates.habits.split(",").map((h) => h.trim());
       }
     }
-    
+
     if (req.file) {
-      updates.profilePhoto = `/uploads/${req.file.filename}`;
+      updates.profilePhoto = req.file.path ;
     }
 
     const updatedUser = await User.findByIdAndUpdate(req.user._id, updates, {
@@ -164,10 +165,11 @@ export const updateUserProfile = async (req, res) => {
     });
   } catch (error) {
     console.error("Update profile error:", error);
-    res.status(500).json({ message: "Error updating profile", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error updating profile", error: error.message });
   }
 };
-
 
 // Change password
 export const changePassword = async (req, res) => {
@@ -175,7 +177,9 @@ export const changePassword = async (req, res) => {
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
-      return res.status(400).json({ message: "Both current and new passwords are required" });
+      return res
+        .status(400)
+        .json({ message: "Both current and new passwords are required" });
     }
 
     const user = await User.findById(req.user._id);
@@ -197,9 +201,8 @@ export const changePassword = async (req, res) => {
 
     res.json({ message: "Password updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error changing password", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error changing password", error: error.message });
   }
 };
-
-
-

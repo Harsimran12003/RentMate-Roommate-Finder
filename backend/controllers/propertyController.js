@@ -39,7 +39,7 @@ export const addProperty = async (req, res) => {
       city,
       location,
       tags: normalizedTags,
-      image: req.file ? `/uploads/${req.file.filename}` : null,
+      image: req.file ? req.file.path : null,
       tenant: req.user._id,
     });
 
@@ -145,7 +145,7 @@ export const updateProperty = async (req, res) => {
     property.tags = normalizedTags;
 
     if (req.file) {
-      property.image = `/uploads/${req.file.filename}`;
+      property.image = req.file.path ;
     }
 
     await property.save();
