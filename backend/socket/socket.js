@@ -7,7 +7,7 @@ const socketHandler = (server) => {
     cors: {
       origin: [
         "http://localhost:5173",
-        "https://rent-mate-roommate-finder.vercel.app/",
+        "https://rent-mate-roommate-finder.vercel.app",
       ],
       methods: ["GET", "POST"],
     },
