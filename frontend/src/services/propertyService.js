@@ -27,8 +27,8 @@ export const addProperty = async (newProperty) => {
 
   Object.keys(newProperty).forEach((key) => {
     if (key === "tags" && Array.isArray(newProperty.tags)) {
-      newProperty.tags.forEach((tag) => formData.append("tags[]", tag));
-    } else if (newProperty[key]) {
+      newProperty.tags.forEach((tag) => formData.append("tags", tag));
+    } else if (newProperty[key] !== undefined) {
       formData.append(key, newProperty[key]);
     }
   });
@@ -46,18 +46,23 @@ export const updateProperty = async (id, updatedProperty) => {
 
   Object.keys(updatedProperty).forEach((key) => {
     if (key === "tags" && Array.isArray(updatedProperty.tags)) {
-      updatedProperty.tags.forEach((tag) => formData.append("tags[]", tag));
-    } else if (key === "image" && !updatedProperty.image) {
-      // Skip image if not updated
-      return;
-    } else if (updatedProperty[key]) {
+      updatedProperty.tags.forEach((tag) => formData.append("tags", tag));
+    } 
+    else if (key === "image") {
+      if (updatedProperty.image instanceof File) {
+        formData.append("image", updatedProperty.image);
+      }
+    } 
+    else if (updatedProperty[key] !== undefined) {
       formData.append(key, updatedProperty[key]);
     }
   });
 
   const { data } = await axios.put(`${API_URL}/${id}`, formData, {
-    headers: { ...getAuthHeaders(), "Content-Type": "multipart/form-data" },
-    withCredentials: true,
+    headers: {
+      ...getAuthHeaders(),
+      "Content-Type": "multipart/form-data",
+    },
   });
 
   return data;

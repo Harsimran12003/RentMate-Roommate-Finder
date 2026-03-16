@@ -4,7 +4,7 @@ import multer from "multer";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); 
+    cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
@@ -22,7 +22,6 @@ export const addProperty = async (req, res) => {
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized: Please login" });
     }
-
 
     let normalizedTags = [];
     if (Array.isArray(tags)) {
@@ -51,7 +50,6 @@ export const addProperty = async (req, res) => {
   }
 };
 
-
 // getProperties
 export const getProperties = async (req, res) => {
   try {
@@ -59,12 +57,12 @@ export const getProperties = async (req, res) => {
     let filter = {};
 
     if (state) {
-      filter.state = { $regex: new RegExp(`${state}`, "i") }; 
+      filter.state = { $regex: new RegExp(`${state}`, "i") };
       // exact match ignoring case
     }
 
     if (city) {
-      filter.city = { $regex: new RegExp(`${city}`, "i") }; 
+      filter.city = { $regex: new RegExp(`${city}`, "i") };
       // exact match ignoring case
     }
 
@@ -75,7 +73,7 @@ export const getProperties = async (req, res) => {
 
     const properties = await Property.find(filter).populate(
       "tenant",
-      "fullName age gender city occupation hobbies habits profilePhoto"
+      "fullName age gender city occupation hobbies habits profilePhoto",
     );
 
     res.json(properties);
@@ -83,9 +81,6 @@ export const getProperties = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
-
 
 export const getMyProperties = async (req, res) => {
   try {
@@ -99,8 +94,10 @@ export const getMyProperties = async (req, res) => {
 // GET single property with tenant
 export const getPropertyById = async (req, res) => {
   try {
-    const property = await Property.findById(req.params.id)
-      .populate("tenant", "fullName gender city occupation hobbies habits  profilePhoto");
+    const property = await Property.findById(req.params.id).populate(
+      "tenant",
+      "fullName gender city occupation hobbies habits  profilePhoto",
+    );
 
     if (!property) {
       return res.status(404).json({ message: "Property not found" });
@@ -113,8 +110,6 @@ export const getPropertyById = async (req, res) => {
   }
 };
 
-
-
 // Update Property
 export const updateProperty = async (req, res) => {
   try {
@@ -123,7 +118,8 @@ export const updateProperty = async (req, res) => {
     let { tags } = req.body;
 
     let property = await Property.findById(id);
-    if (!property) return res.status(404).json({ message: "Property not found" });
+    if (!property)
+      return res.status(404).json({ message: "Property not found" });
 
     if (property.tenant.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "Unauthorized" });
@@ -145,7 +141,7 @@ export const updateProperty = async (req, res) => {
     property.tags = normalizedTags;
 
     if (req.file) {
-      property.image = req.file.path ;
+      property.image = req.file.path; 
     }
 
     await property.save();
@@ -156,14 +152,14 @@ export const updateProperty = async (req, res) => {
   }
 };
 
-
 // Delete Property
 export const deleteProperty = async (req, res) => {
   try {
     const { id } = req.params;
 
     const property = await Property.findById(id);
-    if (!property) return res.status(404).json({ message: "Property not found" });
+    if (!property)
+      return res.status(404).json({ message: "Property not found" });
 
     if (property.tenant.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "Unauthorized" });
