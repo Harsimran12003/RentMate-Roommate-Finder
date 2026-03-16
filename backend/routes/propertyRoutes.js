@@ -1,8 +1,9 @@
 import express from "express";
-import { addProperty, upload, getProperties, 
+import { addProperty, getProperties, 
         getPropertyById, getMyProperties, updateProperty, 
         deleteProperty  } from "../controllers/propertyController.js";
 import protect from "../middleware/authMiddleware.js";
+import upload from "../middleware/upload.js";
 
 const router = express.Router();
 
