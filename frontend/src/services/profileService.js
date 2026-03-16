@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/users";
+const API_URL = "https://rent-mate-backend.vercel.app/api/users";
 
 // Update user profile
 export const updateUserProfile = async (token, payload, file = null) => {

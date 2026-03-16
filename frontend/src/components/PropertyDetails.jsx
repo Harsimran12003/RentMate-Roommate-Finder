@@ -57,7 +57,7 @@ const PropertyDetails = ({ propertyId, onClose }) => {
                   property.image
                     ? property.image.startsWith("http")
                       ? property.image
-                      : `http://localhost:5000${property.image}`
+                      : `https://rent-mate-backend.vercel.app${property.image}`
                     : "https://via.placeholder.com/400"
                 }
                 alt={property.title}
@@ -83,7 +83,7 @@ const PropertyDetails = ({ propertyId, onClose }) => {
                         tenant.profilePhoto
                           ? tenant.profilePhoto.startsWith("http")
                             ? tenant.profilePhoto
-                            : `http://localhost:5000${tenant.profilePhoto}`
+                            : `https://rent-mate-backend.vercel.app${tenant.profilePhoto}`
                           : "https://via.placeholder.com/400"
                       }
                       alt={tenant.fullName}
@@ -104,7 +104,7 @@ const PropertyDetails = ({ propertyId, onClose }) => {
                     </button>
                     <button
                       onClick={async () => {
-                        const res = await fetch("http://localhost:5000/api/chats", {
+                        const res = await fetch("https://rent-mate-backend.vercel.app/api/chats", {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({
@@ -133,7 +133,7 @@ const PropertyDetails = ({ propertyId, onClose }) => {
                     tenant.profilePhoto
                       ? tenant.profilePhoto.startsWith("http")
                         ? tenant.profilePhoto
-                        : `http://localhost:5000${tenant.profilePhoto}`
+                        : `https://rent-mate-backend.vercel.app${tenant.profilePhoto}`
                       : "https://via.placeholder.com/400"
                   }
                   alt={tenant.fullName}
@@ -174,7 +174,7 @@ const PropertyDetails = ({ propertyId, onClose }) => {
 
               <button
                 onClick={async () => {
-                  const res = await fetch("http://localhost:5000/api/chats", {
+                  const res = await fetch("https://rent-mate-backend.vercel.app/api/chats", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({

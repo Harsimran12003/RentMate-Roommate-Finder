@@ -11,7 +11,7 @@ const PropertyCard = ({ property, viewMy, onEdit, onDelete, onViewDetails }) => 
           property.image
             ? property.image.startsWith("http")
               ? property.image
-              : `http://localhost:5000${property.image}`
+              : `https://rent-mate-backend.vercel.app${property.image}`
             : "https://via.placeholder.com/400"
         }
         alt={property.title}

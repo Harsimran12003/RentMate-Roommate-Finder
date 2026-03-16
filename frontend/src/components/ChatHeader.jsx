@@ -16,7 +16,7 @@ const ChatHeader = ({ otherUser, onOpenList = () => {} }) => {
       <img
         src={
           otherUser?.profilePhoto
-            ? `http://localhost:5000${otherUser.profilePhoto}`
+            ? `https://rent-mate-backend.vercel.app${otherUser.profilePhoto}`
             : "/default-avatar.png"
         }
         alt={otherUser?.fullName || "User"}

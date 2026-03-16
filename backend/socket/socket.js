@@ -5,7 +5,10 @@ import Chat from "../models/Chat.js";
 const socketHandler = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173", 
+      origin: [
+        "http://localhost:5173",
+        "https://rent-mate-roommate-finder.vercel.app/",
+      ],
       methods: ["GET", "POST"],
     },
   });
@@ -28,7 +31,7 @@ const socketHandler = (server) => {
         await Chat.findByIdAndUpdate(
           newMsg.chatId,
           { lastMessage: newMsg._id, updatedAt: new Date() },
-          { new: true }
+          { new: true },
         );
 
         io.to(msgData.chatId).emit("newMessage", newMsg);

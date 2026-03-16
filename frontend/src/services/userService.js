@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/users"; 
+const API_URL = "https://rent-mate-backend.vercel.app/api/users"; 
 
 // Register user
 export const registerUser = async (formData) => {
   try {
-    const response = await axios.post("http://localhost:5000/api/users/register", formData, {
+    const response = await axios.post("https://rent-mate-backend.vercel.app/api/users/register", formData, {
   headers: { "Content-Type": "multipart/form-data" },
 });
     return response.data;
@@ -29,7 +29,7 @@ export const getUserProfile = async () => {
     throw new Error("No token found");
   }
 
-  const res = await fetch("http://localhost:5000/api/users/profile", {
+  const res = await fetch("https://rent-mate-backend.vercel.app/api/users/profile", {
     headers: {
       Authorization: `Bearer ${token}`,
     },

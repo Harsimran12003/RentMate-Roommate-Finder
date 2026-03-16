@@ -13,7 +13,7 @@ const ProfilePane = ({ match, onClose }) => {
   const getFileUrl = (filePath) => {
     if (!filePath || filePath === "undefined" || filePath === "") return null;
     if (filePath.startsWith("http")) return filePath;
-    return `http://localhost:5000${filePath.startsWith("/") ? filePath : `/${filePath}`}`;
+    return `https://rent-mate-backend.vercel.app${filePath.startsWith("/") ? filePath : `/${filePath}`}`;
   };
 
   const policeVerification = getFileUrl(match.policeVerification);
@@ -120,7 +120,7 @@ const ProfilePane = ({ match, onClose }) => {
         {/* Start Chat Button */}
         <button
           onClick={async () => {
-            const res = await fetch("http://localhost:5000/api/chats", {
+            const res = await fetch("https://rent-mate-backend.vercel.app/api/chats", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({

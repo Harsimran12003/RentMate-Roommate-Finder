@@ -10,7 +10,7 @@ import EmojiPicker from "emoji-picker-react";
 import { IoClose } from "react-icons/io5";
 import { fetchChats, fetchMessages, uploadFile } from "../services/chatService";
 
-const socket = io("http://localhost:5000");
+const socket = io("https://rent-mate-backend.vercel.app");
 
 const ChatPage = () => {
   const { chatId: paramChatId } = useParams();

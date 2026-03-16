@@ -10,7 +10,7 @@ const ChatList = ({ mobileOpen = false, onClose = () => {} }) => {
 
   useEffect(() => {
     if (!currentUser) return;
-    fetch(`http://localhost:5000/api/chats/${currentUser.id}`)
+    fetch(`https://rent-mate-backend.vercel.app/api/chats/${currentUser.id}`)
       .then((res) => res.json())
       .then((data) => setChats(data))
       .catch((err) => console.error("Failed to load chats:", err));

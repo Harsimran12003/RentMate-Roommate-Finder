@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/expenses";
+const API_URL = "https://rent-mate-backend.vercel.app/api/expenses";
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");

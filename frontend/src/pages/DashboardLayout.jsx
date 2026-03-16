@@ -84,7 +84,7 @@ const Dashboard = () => {
           <img
             src={
               user.profilePhoto
-                ? `http://localhost:5000${user.profilePhoto}`
+                ? `https://rent-mate-backend.vercel.app${user.profilePhoto}`
                 : "https://via.placeholder.com/100"
             }
             alt="Profile"

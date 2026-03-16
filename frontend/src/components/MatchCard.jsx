@@ -9,7 +9,7 @@ const MatchCard = ({ match, onViewProfile }) => {
             match.profilePhoto
               ? match.profilePhoto.startsWith("http")
                 ? match.profilePhoto
-                : `http://localhost:5000${match.profilePhoto}`
+                : `https://rent-mate-backend.vercel.app${match.profilePhoto}`
               : "https://via.placeholder.com/150"
           }
           alt={match.fullName}
