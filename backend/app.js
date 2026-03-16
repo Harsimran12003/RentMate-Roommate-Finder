@@ -37,7 +37,7 @@ socketHandler(server);
 // MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI, {
-    dbName: "rentmate",
+    
     serverSelectionTimeoutMS: 30000,
   })
   .then(() => console.log("MongoDB connected"))
