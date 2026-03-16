@@ -82,11 +82,7 @@ const Dashboard = () => {
             </p>
           </div>
           <img
-            src={
-              user.profilePhoto
-                ? `https://rent-mate-backend.vercel.app${user.profilePhoto}`
-                : "https://via.placeholder.com/100"
-            }
+            src={user.profilePhoto || "https://via.placeholder.com/100"}
             alt="Profile"
             className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-white shadow-xl mt-4 md:mt-0 md:ml-6"
           />
@@ -94,7 +90,9 @@ const Dashboard = () => {
 
         {/* Getting Started Section */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-5 sm:p-6 animate-fadeIn">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4">➡️ Getting Started</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4">
+            ➡️ Getting Started
+          </h2>
           <ol className="list-decimal list-inside space-y-3 text-gray-700 dark:text-gray-300 text-sm sm:text-base">
             <li>📝 Add your profile</li>
             <li>🏠 Browse available properties</li>
@@ -122,9 +120,10 @@ const Dashboard = () => {
 
           {showDisclaimer && (
             <p className="mt-3 text-gray-700 dark:text-gray-300 leading-relaxed text-sm sm:text-base transition-all duration-300">
-              RentMate is under active development and may not be fully verified.
-              Please verify all listings and profiles before making commitments.
-              The developers are not liable for any misuse or discrepancies.
+              RentMate is under active development and may not be fully
+              verified. Please verify all listings and profiles before making
+              commitments. The developers are not liable for any misuse or
+              discrepancies.
             </p>
           )}
         </div>
